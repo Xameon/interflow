@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import pool from '@/lib/db';
 import { jwtSecretEncoded } from '@/lib/env';
@@ -9,8 +9,8 @@ import {
   SignUpCredentialsSchema,
 } from '@/models/auth.model';
 
-export async function POST(request: Request) {
-  const payload = await request.json();
+export async function POST(request: NextRequest) {
+  const payload = (await request.json()) as SignUpCredentials;
 
   try {
     SignUpCredentialsSchema.parse(payload);
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { name, email, password, avatarUrl } = payload as SignUpCredentials;
+  const { name, email, password, avatarUrl } = payload;
 
   const hashedPassword = await bcrypt.hash(password, 10);
 

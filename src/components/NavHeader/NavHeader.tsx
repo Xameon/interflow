@@ -13,6 +13,9 @@ export function NavHeader() {
         <ChakraLink asChild>
           <Link href='/posts'>Posts</Link>
         </ChakraLink>
+        <ChakraLink asChild>
+          <Link href='/posts/new'>Create Post</Link>
+        </ChakraLink>
       </Flex>
       <NavActions />
     </Flex>

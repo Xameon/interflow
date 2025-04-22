@@ -3,6 +3,10 @@ import { MiddlewareConfig, NextRequest, NextResponse } from 'next/server';
 
 import { jwtSecretEncoded } from '@/lib/env';
 
+type JwtPayload = {
+  id: string;
+};
+
 export async function middleware(req: NextRequest) {
   const token = req.headers.get('Authorization');
 
@@ -11,14 +15,24 @@ export async function middleware(req: NextRequest) {
   }
 
   try {
-    await jwtVerify(token, jwtSecretEncoded);
+    const { payload } = await jwtVerify(token, jwtSecretEncoded);
 
-    return NextResponse.next();
+    const { id } = payload as JwtPayload;
+
+    const response = NextResponse.next();
+
+    response.headers.set('x-user-id', id);
+
+    return response;
   } catch {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 }
 
 export const config: MiddlewareConfig = {
-  matcher: [{ source: '/api/users/:id' }, { source: '/api/auth' }],
+  matcher: [
+    { source: '/api/users/:id' },
+    { source: '/api/auth' },
+    { source: '/api/posts' },
+  ],
 };

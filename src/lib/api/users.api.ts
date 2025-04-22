@@ -1,6 +1,6 @@
-import { api } from './api';
-
 import { User } from '@/models/users.model';
+
+import { api } from './api';
 
 // ..................................................
 // #region Get User By ID

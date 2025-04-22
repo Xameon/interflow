@@ -1,10 +1,12 @@
+import { Box } from '@chakra-ui/react';
 import type { Metadata } from 'next';
 
-import './globals.css';
 import { NavHeader } from '@/components/NavHeader';
 import { Provider } from '@/components/ui/provider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { QueryProvider } from '@/lib/providers/QueryProvider';
+
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'InterFlow',
@@ -22,11 +24,13 @@ export default function RootLayout({
       <body style={{ padding: '1rem' }}>
         <QueryProvider>
           <AuthProvider>
-            <Provider>
-              <header>
+            <Provider defaultTheme='light'>
+              <Box as='header' colorPalette='orange'>
                 <NavHeader />
-              </header>
-              <main>{children}</main>
+              </Box>
+              <Box as='main' colorPalette='orange'>
+                {children}
+              </Box>
             </Provider>
           </AuthProvider>
         </QueryProvider>
