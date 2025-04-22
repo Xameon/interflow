@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import { SignJWT } from 'jose';
+import { NextResponse } from 'next/server';
+
 import pool from '@/lib/db';
 import { jwtSecretEncoded } from '@/lib/env';
 import {
@@ -7,7 +9,6 @@ import {
   SignInCredentialsSchema,
 } from '@/models/api/auth.model';
 import { DatabaseUser } from '@/models/api/users.model';
-import { SignJWT } from 'jose';
 
 export async function POST(request: Request) {
   const payload = await request.json();
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json(
       { message: 'Invalid data', error },
-      { status: 422 }
+      { status: 422 },
     );
   }
 
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
     if (!isPasswordValid) {
       return NextResponse.json(
         { message: 'Invalid credentials' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
   } catch (e) {
     return NextResponse.json(
       { message: 'Error during sign-in', e },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,6 +1,7 @@
 import { Flex, Link as ChakraLink } from '@chakra-ui/react';
-import { NavActions } from './components/NavActions';
 import Link from 'next/link';
+
+import { NavActions } from './components/NavActions';
 
 export function NavHeader() {
   return (

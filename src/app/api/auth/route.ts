@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { jwtSecretEncoded } from '@/lib/env';
 import { jwtVerify } from 'jose';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { jwtSecretEncoded } from '@/lib/env';
 
 export async function GET(req: NextRequest) {
   const token = req.headers.get('Authorization');

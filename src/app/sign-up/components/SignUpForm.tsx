@@ -2,14 +2,15 @@
 
 import { Button, Flex, Heading, Input } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+
 import { Field } from '@/components/ui/field';
+import { PasswordInput } from '@/components/ui/password-input';
+import { useSignUp } from '@/hooks/auth/useSignUp';
 import {
   SignUpCredentials,
   SignUpCredentialsSchema,
 } from '@/models/api/auth.model';
-import { useForm } from 'react-hook-form';
-import { PasswordInput } from '@/components/ui/password-input';
-import { useSignUp } from '@/hooks/auth/useSignUp';
 
 const defaultValues: SignUpCredentials = {
   name: '',

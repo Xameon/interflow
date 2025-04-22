@@ -1,12 +1,13 @@
-import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import { SignJWT } from 'jose';
+import { NextResponse } from 'next/server';
+
 import pool from '@/lib/db';
 import { jwtSecretEncoded } from '@/lib/env';
 import {
   SignUpCredentials,
   SignUpCredentialsSchema,
 } from '@/models/api/auth.model';
-import { SignJWT } from 'jose';
 
 export async function POST(request: Request) {
   const payload = await request.json();
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json(
       { message: 'Invalid data', error },
-      { status: 422 }
+      { status: 422 },
     );
   }
 
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
   try {
     const res = await pool.query(
       'INSERT INTO users (email, password_hash, name, avatar_url) VALUES ($1, $2, $3, $4) RETURNING id',
-      [email, hashedPassword, name, avatarUrl]
+      [email, hashedPassword, name, avatarUrl],
     );
 
     const userId = res.rows[0].id;
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json(
       { message: 'Error during sign-up', error },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

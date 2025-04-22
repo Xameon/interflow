@@ -1,6 +1,7 @@
-import { MiddlewareConfig, NextRequest, NextResponse } from 'next/server';
-import { jwtSecretEncoded } from '@/lib/env';
 import { jwtVerify } from 'jose';
+import { MiddlewareConfig, NextRequest, NextResponse } from 'next/server';
+
+import { jwtSecretEncoded } from '@/lib/env';
 
 export async function middleware(req: NextRequest) {
   const token = req.headers.get('Authorization');

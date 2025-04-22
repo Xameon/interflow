@@ -1,7 +1,8 @@
 'use client';
 
-import { useAuth } from '@/hooks/auth/useAuth';
 import { createContext, PropsWithChildren, useEffect, useState } from 'react';
+
+import { useAuth } from '@/hooks/auth/useAuth';
 
 type AuthContextType = {
   userId: string | null;
@@ -14,8 +15,6 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: PropsWithChildren) {
   const [token, setToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-
-  console.log(token);
 
   const { data, isFetching: authLoading } = useAuth({
     options: { enabled: !!token, retry: false },

@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint src",
+    "tsc": "tsc --project tsconfig.json --pretty && echo Everything's alright.",
+    "prettier": "prettier --write ."
   },
   "dependencies": {
     "@chakra-ui/react": "^3.9.0",
@@ -27,13 +29,15 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^20",
     "@types/pg": "^8.11.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^15.2.0",
+    "eslint-import-resolver-typescript": "^4.3.4",
+    "eslint-plugin-import": "^2.31.0",
+    "prettier": "^3.5.3",
     "typescript": "^5"
   }
 }

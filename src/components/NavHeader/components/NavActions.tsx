@@ -1,9 +1,10 @@
 'use client';
 
-import { useAuthContext } from '@/hooks/useAuthContext';
-import { useUser } from '@/hooks/users/useUser';
 import { Button, Flex, Spinner, Text } from '@chakra-ui/react';
 import Link from 'next/link';
+
+import { useAuthContext } from '@/hooks/useAuthContext';
+import { useUser } from '@/hooks/users/useUser';
 
 export function NavActions() {
   const { userId, logout, authLoading } = useAuthContext();
