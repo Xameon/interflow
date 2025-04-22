@@ -2,7 +2,7 @@ import {
   AuthToken,
   SignInCredentials,
   SignUpCredentials,
-} from '@/models/api/auth.model';
+} from '@/models/auth.model';
 
 import { api } from './api';
 

@@ -1,3 +1,18 @@
+// ..................................................
+// #region API Response
+
+export type APIError<T = null> = {
+  status: 'success' | 'failed' | 'error';
+  message?: string;
+  data: T;
+};
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Query Params
+
 type QueryOptions = {
   enabled?: boolean;
   staleTime?: number;
@@ -12,3 +27,6 @@ export type QueryParams<T = undefined> = [T] extends [undefined]
       params: T;
       options?: QueryOptions;
     };
+
+// #endregion
+// ..................................................

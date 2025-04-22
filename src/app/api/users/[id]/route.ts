@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import pool from '@/lib/db';
-import { DatabaseUser, User } from '@/models/api/users.model';
+
+import { DatabaseUser, User } from '@/models/users.model';
 
 type Params = {
   params: Promise<{ id: string }>;

@@ -10,7 +10,7 @@ import { useSignIn } from '@/hooks/auth/useSignIn';
 import {
   SignInCredentials,
   SignInCredentialsSchema,
-} from '@/models/api/auth.model';
+} from '@/models/auth.model';
 
 const defaultValues: SignInCredentials = {
   email: '',

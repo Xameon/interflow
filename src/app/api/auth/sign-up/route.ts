@@ -7,7 +7,7 @@ import { jwtSecretEncoded } from '@/lib/env';
 import {
   SignUpCredentials,
   SignUpCredentialsSchema,
-} from '@/models/api/auth.model';
+} from '@/models/auth.model';
 
 export async function POST(request: Request) {
   const payload = await request.json();
