@@ -1,18 +1,18 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import pool from '@/lib/db';
-import { jwtSecret } from '@/lib/env';
+import { jwtSecretEncoded } from '@/lib/env';
 import {
   SignUpCredentials,
   SignUpCredentialsSchema,
 } from '@/models/api/auth.model';
+import { SignJWT } from 'jose';
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const payload = await request.json();
 
   try {
-    SignUpCredentialsSchema.parse(body);
+    SignUpCredentialsSchema.parse(payload);
   } catch (error) {
     return NextResponse.json(
       { message: 'Invalid data', error },
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { name, email, password, avatarUrl } = body as SignUpCredentials;
+  const { name, email, password, avatarUrl } = payload as SignUpCredentials;
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -32,12 +32,14 @@ export async function POST(request: Request) {
 
     const userId = res.rows[0].id;
 
-    const token = jwt.sign({ id: userId }, jwtSecret);
+    const token = await new SignJWT({ id: userId })
+      .setProtectedHeader({ alg: 'HS256' })
+      .sign(jwtSecretEncoded);
 
     return NextResponse.json({ token });
   } catch (error) {
     return NextResponse.json(
-      { message: 'Error during sign-up', error: JSON.stringify(error) },
+      { message: 'Error during sign-up', error },
       { status: 500 }
     );
   }

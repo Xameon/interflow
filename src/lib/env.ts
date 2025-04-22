@@ -6,4 +6,6 @@ if (!JWT_SECRET) {
 
 const jwtSecret: string = JWT_SECRET;
 
-export { jwtSecret };
+const jwtSecretEncoded = new TextEncoder().encode(jwtSecret);
+
+export { jwtSecret, jwtSecretEncoded };

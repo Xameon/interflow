@@ -5,10 +5,9 @@ import { z } from 'zod';
 
 export const UserSchema = z.object({
   id: z.string().uuid(),
-  name: z.string(),
+  name: z.string().min(3),
   email: z.string().email(),
-  password: z.string(),
-  avatarUrl: z.string().nullable(),
+  avatarUrl: z.string().url().nullable(),
   createdAt: z.string().datetime(),
 });
 
