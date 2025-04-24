@@ -27,3 +27,13 @@ export const createPost = async (payload: PostPayload) => {
 
 // #endregion
 // ..................................................
+
+// ..................................................
+// #region Delete Post
+
+export const deletePost = async (id: string) => {
+  await api.delete(`posts/${id}`);
+};
+
+// #endregion
+// ..................................................

@@ -1,9 +1,12 @@
 import { Box, For, Heading, Text, Image, Center } from '@chakra-ui/react';
+import { cookies } from 'next/headers';
 
+import { PostActions } from '@/components/posts/PostActions';
+import { jwtTokenVerify } from '@/lib';
 import pool from '@/lib/db';
 import { DatabasePost, Post } from '@/models/posts.model';
 
-async function getPostsFromDB(): Promise<Post[]> {
+const getPostsFromDB = async (): Promise<Post[]> => {
   const result = await pool.query(`
     SELECT
   p.id,
@@ -12,7 +15,8 @@ async function getPostsFromDB(): Promise<Post[]> {
   p.created_at,
   p.updated_at,
   u.name AS author_name,
-  u.avatar_url AS author_avatar,
+  u.avatar_url AS author_avatar_url,
+  u.id AS author_id,
   (
     SELECT json_agg(image_url)
     FROM post_images
@@ -36,7 +40,8 @@ ORDER BY p.created_at DESC;
 
   return (result.rows as DatabasePost[]).map(dbPost => {
     const {
-      author_avatar,
+      author_id,
+      author_avatar_url,
       author_name,
       created_at,
       updated_at,
@@ -49,7 +54,8 @@ ORDER BY p.created_at DESC;
     return {
       ...restData,
       author: {
-        avatar: author_avatar,
+        id: author_id,
+        avatarUrl: author_avatar_url,
         username: author_name,
       },
       createdAt: created_at,
@@ -59,10 +65,18 @@ ORDER BY p.created_at DESC;
       imageUrls: image_urls,
     };
   });
-}
+};
 
 const PostsPage = async () => {
+  const cookiesList = await cookies();
+
   const posts = await getPostsFromDB();
+
+  const token = cookiesList.get('token');
+
+  const jwtPayload = await jwtTokenVerify(token?.value);
+
+  const userId = jwtPayload?.id;
 
   return (
     <Box
@@ -102,6 +116,7 @@ const PostsPage = async () => {
             <Text>{post.description}</Text>
             <Text>Created: {post.createdAt.toLocaleString()}</Text>
             <Text>Author: {post.author.username}</Text>
+            {userId === post.author.id && <PostActions id={post.id} />}
           </Box>
         )}
       </For>

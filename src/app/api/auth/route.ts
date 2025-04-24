@@ -1,22 +1,11 @@
-import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { jwtSecretEncoded } from '@/lib/env';
+export const GET = async (req: NextRequest) => {
+  const userId = req.headers.get('x-user-id');
 
-export async function GET(req: NextRequest) {
-  const token = req.headers.get('Authorization');
-
-  if (!token) {
-    return NextResponse.json({}, { status: 401 });
+  if (!userId) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  try {
-    const { payload } = await jwtVerify(token, jwtSecretEncoded);
-
-    const decoded = payload as { id: string };
-
-    return NextResponse.json({ userId: decoded.id });
-  } catch {
-    return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
-  }
-}
+  return NextResponse.json({ userId });
+};

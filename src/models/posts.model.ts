@@ -10,8 +10,9 @@ export const PostSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   author: z.object({
+    id: z.string().uuid(),
     username: z.string(),
-    avatar: z.string().nullable(),
+    avatarUrl: z.string().nullable(),
   }),
   imageUrls: z.array(z.string()).nullable(),
   likesCount: z.string(),
@@ -47,13 +48,26 @@ export const DatabasePostSchema = z.object({
   created_at: z.date(),
   updated_at: z.date(),
   author_name: z.string(),
-  author_avatar: z.string().nullable(),
+  author_avatar_url: z.string().nullable(),
+  author_id: z.string().uuid(),
   image_urls: z.array(z.string()).nullable(),
   likes_count: z.string(),
   comments_count: z.string(),
 });
 
 export type DatabasePost = z.infer<typeof DatabasePostSchema>;
+
+export const DatabasePostRowSchema = z.object({
+  id: z.string().uuid(),
+  user_id: z.string().uuid(),
+  title: z.string(),
+  description: z.string(),
+  created_at: z.string().datetime(),
+  updated_at: z.string().datetime(),
+  deleted_at: z.string().datetime().nullable(),
+});
+
+export type DatabasePostRow = z.infer<typeof DatabasePostRowSchema>;
 
 // #endregion
 // ..................................................

@@ -1,38 +1,57 @@
-import { jwtVerify } from 'jose';
-import { MiddlewareConfig, NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-import { jwtSecretEncoded } from '@/lib/env';
+import { jwtTokenVerify } from './lib';
 
-type JwtPayload = {
-  id: string;
-};
+const protectedRoutes = [
+  {
+    pathname: '/api/auth',
+    method: 'GET',
+  },
+  {
+    pathname: '/api/posts',
+    method: 'POST',
+  },
+  {
+    pathname: '/api/posts/:id',
+    method: 'DELETE',
+  },
+];
 
-export async function middleware(req: NextRequest) {
-  const token = req.headers.get('Authorization');
+export const middleware = async (req: NextRequest) => {
+  const token = req.cookies.get('token');
 
-  if (!token) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-  }
+  const { pathname } = req.nextUrl;
+  const { method } = req;
 
-  try {
-    const { payload } = await jwtVerify(token, jwtSecretEncoded);
+  const isProtected = protectedRoutes.some(route => {
+    const pattern = '^' + route.pathname.replace(/:[^/]+/g, '[^/]+') + '$';
+    const regex = new RegExp(pattern);
 
-    const { id } = payload as JwtPayload;
+    return regex.test(pathname) && route.method === method;
+  });
+
+  const jwtPayload = await jwtTokenVerify(token?.value);
+
+  if (jwtPayload) {
+    const { id } = jwtPayload;
 
     const response = NextResponse.next();
 
     response.headers.set('x-user-id', id);
 
     return response;
-  } catch {
+  }
+
+  if (isProtected) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
-}
 
-export const config: MiddlewareConfig = {
-  matcher: [
-    { source: '/api/users/:id' },
-    { source: '/api/auth' },
-    { source: '/api/posts' },
-  ],
+  const response = NextResponse.next();
+  response.headers.delete('x-user-id');
+
+  return response;
 };
+
+// export const config: MiddlewareConfig = {
+//   matcher: [{ source: '/' }],
+// };

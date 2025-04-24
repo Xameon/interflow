@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import pool from '@/lib/db';
+import { APIRequestContext } from '@/models';
 import { DatabaseUser, User } from '@/models/users.model';
 
-type Params = {
-  params: Promise<{ id: string }>;
-};
-
-export async function GET(_: NextRequest, { params }: Params) {
+export async function GET(
+  _: NextRequest,
+  { params }: APIRequestContext<{ id: string }>,
+) {
   const id = (await params).id;
 
   const res = await pool.query('SELECT * FROM users WHERE id = $1', [id]);

@@ -37,7 +37,22 @@ export async function POST(request: NextRequest) {
       .setProtectedHeader({ alg: 'HS256' })
       .sign(jwtSecretEncoded);
 
-    return NextResponse.json({ token });
+    const response = NextResponse.json(
+      {
+        message: 'User created successfully',
+      },
+      { status: 201 },
+    );
+
+    response.cookies.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return response;
   } catch (error) {
     return NextResponse.json(
       { message: 'Error during sign-up', error },

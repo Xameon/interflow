@@ -11,6 +11,16 @@ export type APIError<T = null> = {
 // ..................................................
 
 // ..................................................
+// #region API Request Context
+
+export type APIRequestContext<T> = {
+  params: Promise<T>;
+};
+
+// #endregion
+// ..................................................
+
+// ..................................................
 // #region Query Params
 
 type QueryOptions = {
