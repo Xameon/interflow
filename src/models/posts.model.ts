@@ -7,8 +7,8 @@ export const PostSchema = z.object({
   id: z.string().uuid(),
   title: z.string(),
   description: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
   author: z.object({
     id: z.string().uuid(),
     username: z.string(),

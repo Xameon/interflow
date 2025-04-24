@@ -5,8 +5,6 @@ import { api } from './api';
 // ..................................................
 // #region Posts
 
-// ! This endpoint is unused on client
-
 export const getPosts = async () => {
   const res = await api.get<Post[]>('/posts');
 

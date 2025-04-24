@@ -9,6 +9,7 @@ import {
   Portal,
   Textarea,
 } from '@chakra-ui/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 
 import { useUpdatePost } from '@/hooks/posts/useUpdatePost';
@@ -19,6 +20,9 @@ type EditPostModalProps = {
 };
 
 export const EditPostModal = ({ post }: EditPostModalProps) => {
+  // ..................................................
+  // Hooks Form
+
   const {
     register,
     handleSubmit,
@@ -26,12 +30,26 @@ export const EditPostModal = ({ post }: EditPostModalProps) => {
     formState: { errors },
   } = useForm<UpdatePostPayload>({ defaultValues: post });
 
-  const { mutate: updatePost, isPending: updatePostIsLoading } =
-    useUpdatePost();
+  // ..................................................
+  // API Hooks
+
+  const queryClient = useQueryClient();
+
+  const { mutate: updatePost, isPending: updatePostIsLoading } = useUpdatePost({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+  });
+
+  // ..................................................
+  // Functions
 
   const onSubmit = (payload: UpdatePostPayload) => {
     updatePost(payload);
   };
+
+  // ..................................................
+  // Render
 
   return (
     <Dialog.Root initialFocusEl={() => null} onExitComplete={reset}>

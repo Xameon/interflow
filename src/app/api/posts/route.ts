@@ -1,13 +1,82 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import pool from '@/lib/db';
-import { PostPayload, PostPayloadSchema } from '@/models/posts.model';
+import {
+  DatabasePost,
+  Post,
+  PostPayload,
+  PostPayloadSchema,
+} from '@/models/posts.model';
 
-// ! This endpoint is unused on client
+// ..................................................
+// #region Get Post
+
+const getPostsFromDB = async (): Promise<Post[]> => {
+  const result = await pool.query(`
+    SELECT
+  p.id,
+  p.title,
+  p.description,
+  p.created_at,
+  p.updated_at,
+  u.name AS author_name,
+  u.avatar_url AS author_avatar_url,
+  u.id AS author_id,
+  (
+    SELECT json_agg(image_url)
+    FROM post_images
+    WHERE post_id = p.id
+  ) AS image_urls,
+  (
+    SELECT COUNT(*)
+    FROM likes
+    WHERE post_id = p.id
+  ) AS likes_count,
+  (
+    SELECT COUNT(*)
+    FROM comments
+    WHERE post_id = p.id
+  ) AS comments_count
+FROM posts p
+JOIN users u ON u.id = p.user_id
+WHERE p.deleted_at IS NULL
+ORDER BY p.created_at DESC;
+`);
+
+  return (result.rows as DatabasePost[]).map(dbPost => {
+    const {
+      author_id,
+      author_avatar_url,
+      author_name,
+      created_at,
+      updated_at,
+      image_urls,
+      likes_count,
+      comments_count,
+      ...restData
+    } = dbPost;
+
+    return {
+      ...restData,
+      author: {
+        id: author_id,
+        avatarUrl: author_avatar_url,
+        username: author_name,
+      },
+      createdAt: created_at.toISOString(),
+      updatedAt: updated_at.toISOString(),
+      commentsCount: comments_count,
+      likesCount: likes_count,
+      imageUrls: image_urls,
+    };
+  });
+};
 
 export const GET = async () => {
   try {
-    return NextResponse.json([], { status: 200 });
+    const posts = await getPostsFromDB();
+
+    return NextResponse.json(posts, { status: 200 });
   } catch {
     return NextResponse.json(
       {
@@ -17,6 +86,12 @@ export const GET = async () => {
     );
   }
 };
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Create Post
 
 export const POST = async (request: NextRequest) => {
   const userId = request.headers.get('x-user-id')!;
@@ -62,3 +137,6 @@ export const POST = async (request: NextRequest) => {
     );
   }
 };
+
+// #endregion
+// ..................................................
