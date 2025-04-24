@@ -15,8 +15,9 @@ export const PostSchema = z.object({
     avatarUrl: z.string().nullable(),
   }),
   imageUrls: z.array(z.string()).nullable(),
-  likesCount: z.string(),
-  commentsCount: z.string(),
+  likesCount: z.number(),
+  commentsCount: z.number(),
+  isLiked: z.boolean(),
 });
 
 export type Post = z.infer<typeof PostSchema>;
@@ -66,8 +67,9 @@ export const DatabasePostSchema = z.object({
   author_avatar_url: z.string().nullable(),
   author_id: z.string().uuid(),
   image_urls: z.array(z.string()).nullable(),
-  likes_count: z.string(),
-  comments_count: z.string(),
+  likes_count: z.number(),
+  comments_count: z.number(),
+  is_liked: z.boolean(),
 });
 
 export type DatabasePost = z.infer<typeof DatabasePostSchema>;

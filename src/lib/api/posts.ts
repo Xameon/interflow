@@ -47,3 +47,23 @@ export const deletePost = async (id: string) => {
 
 // #endregion
 // ..................................................
+
+// ..................................................
+// #region Like Post
+
+export const likePost = async (postId: string) => {
+  await api.post(`posts/${postId}/like`);
+};
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Like Post
+
+export const dislikePost = async (postId: string) => {
+  await api.delete(`posts/${postId}/like`);
+};
+
+// #endregion
+// ..................................................

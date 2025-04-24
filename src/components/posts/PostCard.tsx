@@ -12,6 +12,8 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 
 import { useDeletePost } from '@/hooks/posts/useDeletePost';
+import { useDislikePost } from '@/hooks/posts/useDislikePost';
+import { useLikePost } from '@/hooks/posts/useLikePost';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { Post } from '@/models/posts.model';
 
@@ -32,6 +34,18 @@ export const PostCard = ({ post }: PostCardProps) => {
 
   const queryClient = useQueryClient();
 
+  const { mutate: likePost, isPending: likeLoading } = useLikePost({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+  });
+
+  const { mutate: dislikePost, isPending: dislikeLoading } = useDislikePost({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+  });
+
   const { mutate: deletePostAsync, isPending: deletePostLoading } =
     useDeletePost({
       onSuccess: () => {
@@ -44,6 +58,14 @@ export const PostCard = ({ post }: PostCardProps) => {
 
   const handleDeletePost = async () => {
     await deletePostAsync(post.id);
+  };
+
+  const toggleLike = async () => {
+    if (!post.isLiked) {
+      likePost(post.id);
+      return;
+    }
+    dislikePost(post.id);
   };
 
   // ..................................................
@@ -79,18 +101,29 @@ export const PostCard = ({ post }: PostCardProps) => {
         <Text>Updated: {new Date(post.updatedAt).toLocaleString()}</Text>
       )}
       <Text>Author: {post.author.username}</Text>
-      {userId === post.author.id && (
-        <Flex justify='start' gap='1rem'>
-          <Button
-            disabled={deletePostLoading}
-            loading={deletePostLoading}
-            onClick={handleDeletePost}
-          >
-            Delete
-          </Button>
-          <EditPostModal post={post} />
-        </Flex>
-      )}
+      <Text>Likes: {post.likesCount}</Text>
+      <Text>Comments: {post.commentsCount}</Text>
+      <Flex justify='start' gap='1rem'>
+        <Button
+          disabled={likeLoading || dislikeLoading}
+          loading={likeLoading || dislikeLoading}
+          onClick={toggleLike}
+        >
+          {post.isLiked ? 'Dislike' : 'Like'}
+        </Button>
+        {userId === post.author.id && (
+          <>
+            <Button
+              disabled={deletePostLoading}
+              loading={deletePostLoading}
+              onClick={handleDeletePost}
+            >
+              Delete
+            </Button>
+            <EditPostModal post={post} />
+          </>
+        )}
+      </Flex>
     </Box>
   );
 };

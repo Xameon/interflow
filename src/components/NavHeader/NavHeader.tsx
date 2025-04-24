@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { NavActions } from './components/NavActions';
 
-export function NavHeader() {
+export const NavHeader = () => {
   return (
     <Flex justify='space-between'>
       <Flex gap='1rem'>
@@ -20,4 +20,4 @@ export function NavHeader() {
       <NavActions />
     </Flex>
   );
-}
+};

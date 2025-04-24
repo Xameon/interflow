@@ -3,11 +3,12 @@
 import { Button, Flex, Spinner, Text } from '@chakra-ui/react';
 import Link from 'next/link';
 
+import { useLogout } from '@/hooks/auth/useLogout';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { useUser } from '@/hooks/users/useUser';
 
-export function NavActions() {
-  const { userId, logout, authLoading } = useAuthContext();
+export const NavActions = () => {
+  const { userId, authLoading } = useAuthContext();
 
   const { data: user, isFetching: userLoading } = useUser({
     params: { id: userId! },
@@ -15,6 +16,14 @@ export function NavActions() {
       enabled: !!userId,
     },
   });
+
+  const { mutateAsync: logoutAsync, isPending: logoutLoading } = useLogout();
+
+  const handleLogout = async () => {
+    await logoutAsync();
+
+    location.reload();
+  };
 
   const renderActions = () => {
     if (authLoading || userLoading) {
@@ -37,7 +46,13 @@ export function NavActions() {
     return (
       <>
         <Text>{user.name}</Text>
-        <Button variant='subtle' size='sm' onClick={logout}>
+        <Button
+          disabled={logoutLoading}
+          loading={logoutLoading}
+          variant='subtle'
+          size='sm'
+          onClick={handleLogout}
+        >
           Logout
         </Button>
       </>
@@ -49,4 +64,4 @@ export function NavActions() {
       {renderActions()}
     </Flex>
   );
-}
+};

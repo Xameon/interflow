@@ -11,8 +11,9 @@ import {
 // ..................................................
 // #region Get Post
 
-const getPostsFromDB = async (): Promise<Post[]> => {
-  const result = await pool.query(`
+const getPostsFromDB = async (userId: string | null): Promise<Post[]> => {
+  const result = await pool.query(
+    `
     SELECT
   p.id,
   p.title,
@@ -28,20 +29,25 @@ const getPostsFromDB = async (): Promise<Post[]> => {
     WHERE post_id = p.id
   ) AS image_urls,
   (
-    SELECT COUNT(*)
+    SELECT COUNT(*)::int
     FROM likes
     WHERE post_id = p.id
   ) AS likes_count,
   (
-    SELECT COUNT(*)
+    SELECT COUNT(*)::int
     FROM comments
     WHERE post_id = p.id
-  ) AS comments_count
+  ) AS comments_count,
+  EXISTS (
+    SELECT 1 FROM likes WHERE post_id = p.id AND user_id = $1
+  ) AS is_liked
 FROM posts p
 JOIN users u ON u.id = p.user_id
 WHERE p.deleted_at IS NULL
 ORDER BY p.created_at DESC;
-`);
+`,
+    [userId],
+  );
 
   return (result.rows as DatabasePost[]).map(dbPost => {
     const {
@@ -53,6 +59,7 @@ ORDER BY p.created_at DESC;
       image_urls,
       likes_count,
       comments_count,
+      is_liked,
       ...restData
     } = dbPost;
 
@@ -68,13 +75,16 @@ ORDER BY p.created_at DESC;
       commentsCount: comments_count,
       likesCount: likes_count,
       imageUrls: image_urls,
+      isLiked: is_liked,
     };
   });
 };
 
-export const GET = async () => {
+export const GET = async (request: NextRequest) => {
+  const userId = request.headers.get('x-user-id');
+
   try {
-    const posts = await getPostsFromDB();
+    const posts = await getPostsFromDB(userId);
 
     return NextResponse.json(posts, { status: 200 });
   } catch {

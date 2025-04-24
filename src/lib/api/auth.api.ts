@@ -41,3 +41,13 @@ export const signIn = async (payload: SignInCredentials) => {
 
 // #endregion
 // ..................................................
+
+// ..................................................
+// #region Logout
+
+export const logout = async () => {
+  await api.post('auth/logout');
+};
+
+// #endregion
+// ..................................................
