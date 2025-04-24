@@ -25,7 +25,7 @@ export type Post = z.infer<typeof PostSchema>;
 // ..................................................
 
 // ..................................................
-// #region Post Payload
+// #region Create Post Payload
 
 export const PostPayloadSchema = z.object({
   title: z.string(),
@@ -34,6 +34,21 @@ export const PostPayloadSchema = z.object({
 });
 
 export type PostPayload = z.infer<typeof PostPayloadSchema>;
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Update Post Payload
+
+export const UpdatePostPayloadSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  description: z.string(),
+  imageUrls: z.array(z.string()).nullable(),
+});
+
+export type UpdatePostPayload = z.infer<typeof UpdatePostPayloadSchema>;
 
 // #endregion
 // ..................................................

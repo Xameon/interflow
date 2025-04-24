@@ -6,13 +6,13 @@ import { useForm } from 'react-hook-form';
 import { useCreatePost } from '@/hooks/posts/useCreatePost';
 import { PostPayload } from '@/models/posts.model';
 
-const defaultValues: PostPayload = {
+const defaultValues = {
   title: '',
   description: '',
   imageUrls: null,
 };
 
-export const PostForm = () => {
+export const CreatePostForm = () => {
   const {
     register,
     handleSubmit,

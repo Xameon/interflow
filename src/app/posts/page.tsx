@@ -115,8 +115,11 @@ const PostsPage = async () => {
             </Center>
             <Text>{post.description}</Text>
             <Text>Created: {post.createdAt.toLocaleString()}</Text>
+            {post.createdAt.getTime() !== post.updatedAt.getTime() && (
+              <Text>Updated: {post.updatedAt.toLocaleString()}</Text>
+            )}
             <Text>Author: {post.author.username}</Text>
-            {userId === post.author.id && <PostActions id={post.id} />}
+            {userId === post.author.id && <PostActions post={post} />}
           </Box>
         )}
       </For>

@@ -1,4 +1,4 @@
-import { Post, PostPayload } from '@/models/posts.model';
+import { Post, PostPayload, UpdatePostPayload } from '@/models/posts.model';
 
 import { api } from './api';
 
@@ -21,6 +21,18 @@ export const getPosts = async () => {
 
 export const createPost = async (payload: PostPayload) => {
   const res = await api.post('/posts', payload);
+
+  return res;
+};
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region
+
+export const updatePost = async ({ id, ...payload }: UpdatePostPayload) => {
+  const res = await api.put(`/posts/${id}`, payload);
 
   return res;
 };

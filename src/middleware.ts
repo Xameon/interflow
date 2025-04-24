@@ -5,15 +5,15 @@ import { jwtTokenVerify } from './lib';
 const protectedRoutes = [
   {
     pathname: '/api/auth',
-    method: 'GET',
+    methods: ['GET'],
   },
   {
     pathname: '/api/posts',
-    method: 'POST',
+    methods: ['POST'],
   },
   {
     pathname: '/api/posts/:id',
-    method: 'DELETE',
+    methods: ['PUT', 'DELETE'],
   },
 ];
 
@@ -27,7 +27,7 @@ export const middleware = async (req: NextRequest) => {
     const pattern = '^' + route.pathname.replace(/:[^/]+/g, '[^/]+') + '$';
     const regex = new RegExp(pattern);
 
-    return regex.test(pathname) && route.method === method;
+    return regex.test(pathname) && route.methods.includes(method);
   });
 
   const jwtPayload = await jwtTokenVerify(token?.value);
