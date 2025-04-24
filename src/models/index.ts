@@ -27,6 +27,7 @@ type QueryOptions = {
   enabled?: boolean;
   staleTime?: number;
   retry?: boolean;
+  refetchInterval?: number;
 };
 
 export type QueryParams<T = undefined> = [T] extends [undefined]

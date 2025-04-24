@@ -8,7 +8,7 @@ import { PostCard } from './PostCard';
 import { EmptyState } from '../ui/empty-state';
 
 export const PostsList = () => {
-  const { data: posts, isFetching: postsLoading } = usePosts({});
+  const { data: posts, isLoading: postsLoading } = usePosts({});
 
   if (postsLoading) {
     return (
