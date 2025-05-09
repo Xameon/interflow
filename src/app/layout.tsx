@@ -25,12 +25,10 @@ export default function RootLayout({
         <QueryProvider>
           <AuthProvider>
             <Provider defaultTheme='light'>
-              <Box as='header' colorPalette='orange'>
+              <Box as='header'>
                 <NavHeader />
               </Box>
-              <Box as='main' colorPalette='orange'>
-                {children}
-              </Box>
+              <Box as='main'>{children}</Box>
             </Provider>
           </AuthProvider>
         </QueryProvider>

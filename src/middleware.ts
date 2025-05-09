@@ -19,6 +19,10 @@ const protectedRoutes = [
     pathname: '/api/posts/:id/like',
     methods: ['POST', 'DELETE'],
   },
+  {
+    pathname: '/api/posts/:id/comments',
+    methods: ['POST', 'DELETE'],
+  },
 ];
 
 export const middleware = async (req: NextRequest) => {

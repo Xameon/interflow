@@ -17,6 +17,7 @@ import { useLikePost } from '@/hooks/posts/useLikePost';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { Post } from '@/models/posts.model';
 
+import { CommentsModal } from './CommentsModal';
 import { EditPostModal } from './EditPostModal';
 
 type PostCardProps = {
@@ -102,8 +103,8 @@ export const PostCard = ({ post }: PostCardProps) => {
       )}
       <Text>Author: {post.author.username}</Text>
       <Text>Likes: {post.likesCount}</Text>
-      <Text>Comments: {post.commentsCount}</Text>
       <Flex justify='start' gap='1rem'>
+        <CommentsModal postId={post.id} commentsCount={post.commentsCount} />
         <Button
           disabled={likeLoading || dislikeLoading}
           loading={likeLoading || dislikeLoading}

@@ -1,6 +1,9 @@
 // ..................................................
 // #region API Response
 
+import { UseMutationOptions } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
+
 export type APIError<T = null> = {
   status: 'success' | 'failed' | 'error';
   message?: string;
@@ -38,6 +41,25 @@ export type QueryParams<T = undefined> = [T] extends [undefined]
       params: T;
       options?: QueryOptions;
     };
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Mutation Options
+
+/**
+ * `T` = Response Type
+ *
+ * `D` = Params Type
+ */
+
+export type MutationOptions<T = void, D = undefined> = UseMutationOptions<
+  AxiosResponse<T>,
+  Error,
+  D,
+  unknown
+>;
 
 // #endregion
 // ..................................................

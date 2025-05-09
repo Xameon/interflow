@@ -66,7 +66,10 @@ export const PUT = async (
 
     await pool.query('COMMIT');
 
-    return NextResponse.json({ message: 'Post updated successfully' });
+    return NextResponse.json(
+      { message: 'Post updated successfully' },
+      { status: 201 },
+    );
   } catch (e) {
     await pool.query('ROLLBACK');
 
