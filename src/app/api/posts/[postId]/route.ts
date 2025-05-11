@@ -13,9 +13,9 @@ import {
 
 export const PUT = async (
   request: NextRequest,
-  { params }: APIRequestContext<{ id: string }>,
+  { params }: APIRequestContext<{ postId: string }>,
 ) => {
-  const { id } = await params;
+  const { postId } = await params;
   const userId = request.headers.get('x-user-id')!;
 
   const payload = (await request.json()) as PostPayload;
@@ -36,7 +36,7 @@ export const PUT = async (
 
     const existing = await pool.query(
       'SELECT user_id FROM posts WHERE id = $1 AND deleted_at IS NULL',
-      [id],
+      [postId],
     );
 
     if (existing.rowCount === 0) {
@@ -49,10 +49,10 @@ export const PUT = async (
 
     await pool.query(
       'UPDATE posts SET title = $1, description = $2, updated_at = NOW() WHERE id = $3',
-      [title, description, id],
+      [title, description, postId],
     );
 
-    await pool.query('DELETE FROM post_images WHERE post_id = $1', [id]);
+    await pool.query('DELETE FROM post_images WHERE post_id = $1', [postId]);
 
     if (imageUrls && imageUrls.length > 0) {
       const values = imageUrls.map((_, i) => `($1, $${i + 2})`).join(', ');
@@ -60,7 +60,7 @@ export const PUT = async (
       await pool.query(
         `INSERT INTO post_images (post_id, image_url) 
         VALUES ${values}`,
-        [id, ...imageUrls],
+        [postId, ...imageUrls],
       );
     }
 
@@ -88,15 +88,15 @@ export const PUT = async (
 
 export const DELETE = async (
   request: NextRequest,
-  { params }: APIRequestContext<{ id: string }>,
+  { params }: APIRequestContext<{ postId: string }>,
 ) => {
-  const { id } = await params;
+  const { postId } = await params;
   const userId = request.headers.get('x-user-id')!;
 
   const result = await pool.query<DatabasePostRow>(
     `SELECT * FROM posts
     WHERE id = $1 AND deleted_at IS NULL`,
-    [id],
+    [postId],
   );
 
   const post = result.rows[0];
@@ -112,7 +112,9 @@ export const DELETE = async (
     return NextResponse.json('No rights to delete', { status: 403 });
   }
 
-  await pool.query('UPDATE posts SET deleted_at = NOW() WHERE id = $1', [id]);
+  await pool.query('UPDATE posts SET deleted_at = NOW() WHERE id = $1', [
+    postId,
+  ]);
 
   return new Response(null, { status: 204 });
 };

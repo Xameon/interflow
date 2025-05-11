@@ -10,9 +10,9 @@ import {
 
 export const GET = async (
   req: NextRequest,
-  { params }: APIRequestContext<{ id: string }>,
+  { params }: APIRequestContext<{ postId: string }>,
 ) => {
-  const { id: postId } = await params;
+  const { postId } = await params;
 
   try {
     const result = await pool.query(
@@ -66,10 +66,10 @@ export const GET = async (
 
 export const POST = async (
   request: NextRequest,
-  { params }: APIRequestContext<{ id: string }>,
+  { params }: APIRequestContext<{ postId: string }>,
 ) => {
   const userId = request.headers.get('x-user-id')!;
-  const postId = (await params).id;
+  const { postId } = await params;
   const payload = (await request.json()) as CommentPayload;
 
   try {

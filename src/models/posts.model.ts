@@ -18,6 +18,7 @@ export const PostSchema = z.object({
   likesCount: z.number(),
   commentsCount: z.number(),
   isLiked: z.boolean(),
+  communityId: z.string().uuid().nullable(),
 });
 
 export type Post = z.infer<typeof PostSchema>;
@@ -70,6 +71,7 @@ export const DatabasePostSchema = z.object({
   likes_count: z.number(),
   comments_count: z.number(),
   is_liked: z.boolean(),
+  community_id: z.string().uuid().nullable(),
 });
 
 export type DatabasePost = z.infer<typeof DatabasePostSchema>;
@@ -77,6 +79,7 @@ export type DatabasePost = z.infer<typeof DatabasePostSchema>;
 export const DatabasePostRowSchema = z.object({
   id: z.string().uuid(),
   user_id: z.string().uuid(),
+  community_id: z.string().uuid().nullable(),
   title: z.string(),
   description: z.string(),
   created_at: z.string().datetime(),

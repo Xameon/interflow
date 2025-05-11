@@ -9,7 +9,7 @@ import {
 } from '@/models/posts.model';
 
 // ..................................................
-// #region Get Post
+// #region Get Posts
 
 const getPostsFromDB = async (userId: string | null): Promise<Post[]> => {
   const result = await pool.query(
@@ -60,6 +60,7 @@ ORDER BY p.created_at DESC;
       likes_count,
       comments_count,
       is_liked,
+      community_id,
       ...restData
     } = dbPost;
 
@@ -70,6 +71,7 @@ ORDER BY p.created_at DESC;
         avatarUrl: author_avatar_url,
         username: author_name,
       },
+      communityId: community_id,
       createdAt: created_at.toISOString(),
       updatedAt: updated_at.toISOString(),
       commentsCount: comments_count,

@@ -14,9 +14,9 @@ import {
 
 export const GET = async (
   req: NextRequest,
-  { params }: APIRequestContext<{ id: string; commentId: string }>,
+  { params }: APIRequestContext<{ postId: string; commentId: string }>,
 ) => {
-  const { id: postId, commentId } = await params;
+  const { postId, commentId } = await params;
 
   try {
     const result = await pool.query<DatabaseComment>(
@@ -76,9 +76,9 @@ export const GET = async (
 
 export const PUT = async (
   req: NextRequest,
-  { params }: APIRequestContext<{ id: string; commentId: string }>,
+  { params }: APIRequestContext<{ postId: string; commentId: string }>,
 ) => {
-  const { id: postId, commentId } = await params;
+  const { postId, commentId } = await params;
 
   const userId = req.headers.get('x-user-id')!;
 
@@ -135,9 +135,9 @@ export const PUT = async (
 
 export const DELETE = async (
   req: NextRequest,
-  { params }: APIRequestContext<{ id: string; commentId: string }>,
+  { params }: APIRequestContext<{ postId: string; commentId: string }>,
 ) => {
-  const { id: postId, commentId } = await params;
+  const { postId, commentId } = await params;
 
   const userId = req.headers.get('x-user-id')!;
 
