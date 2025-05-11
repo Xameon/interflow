@@ -12,7 +12,7 @@ import { api } from './api';
 // #region Posts
 
 export const getPosts = async () => {
-  const res = await api.get<Post[]>('/posts');
+  const res = await api.get<Post[]>('posts');
 
   return res;
 };
@@ -24,7 +24,7 @@ export const getPosts = async () => {
 // #region Create Post
 
 export const createPost = async (payload: PostPayload) => {
-  const res = await api.post('/posts', payload);
+  const res = await api.post('posts', payload);
 
   return res;
 };
@@ -36,7 +36,7 @@ export const createPost = async (payload: PostPayload) => {
 // #region
 
 export const updatePost = async ({ id, ...payload }: UpdatePostPayload) => {
-  const res = await api.put(`/posts/${id}`, payload);
+  const res = await api.put(`posts/${id}`, payload);
 
   return res;
 };

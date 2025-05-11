@@ -21,13 +21,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
-      <body style={{ padding: '1rem' }}>
+      <body>
         <QueryProvider>
           <AuthProvider>
             <Provider defaultTheme='light'>
-              <Box as='header'>
-                <NavHeader />
-              </Box>
+              <NavHeader />
               <Box as='main'>{children}</Box>
             </Provider>
           </AuthProvider>

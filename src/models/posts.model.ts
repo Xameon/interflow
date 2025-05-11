@@ -14,11 +14,17 @@ export const PostSchema = z.object({
     username: z.string(),
     avatarUrl: z.string().nullable(),
   }),
+  community: z
+    .object({
+      id: z.string().uuid().nullable(),
+      title: z.string(),
+      avatarUrl: z.string().url().nullable(),
+    })
+    .nullable(),
   imageUrls: z.array(z.string()).nullable(),
   likesCount: z.number(),
   commentsCount: z.number(),
   isLiked: z.boolean(),
-  communityId: z.string().uuid().nullable(),
 });
 
 export type Post = z.infer<typeof PostSchema>;
@@ -72,6 +78,8 @@ export const DatabasePostSchema = z.object({
   comments_count: z.number(),
   is_liked: z.boolean(),
   community_id: z.string().uuid().nullable(),
+  community_title: z.string().nullable(),
+  community_avatar_url: z.string().url().nullable(),
 });
 
 export type DatabasePost = z.infer<typeof DatabasePostSchema>;
@@ -79,9 +87,9 @@ export type DatabasePost = z.infer<typeof DatabasePostSchema>;
 export const DatabasePostRowSchema = z.object({
   id: z.string().uuid(),
   user_id: z.string().uuid(),
-  community_id: z.string().uuid().nullable(),
   title: z.string(),
   description: z.string(),
+  community_id: z.string().uuid().nullable(),
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
   deleted_at: z.string().datetime().nullable(),

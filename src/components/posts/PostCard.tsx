@@ -74,7 +74,6 @@ export const PostCard = ({ post }: PostCardProps) => {
 
   return (
     <Box
-      key={post.id}
       css={{
         display: 'flex',
         flexDirection: 'column',

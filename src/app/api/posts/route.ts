@@ -12,44 +12,54 @@ import {
 // #region Get Posts
 
 const getPostsFromDB = async (userId: string | null): Promise<Post[]> => {
-  const result = await pool.query(
+  const result = await pool.query<DatabasePost>(
     `
-    SELECT
-  p.id,
-  p.title,
-  p.description,
-  p.created_at,
-  p.updated_at,
-  u.name AS author_name,
-  u.avatar_url AS author_avatar_url,
-  u.id AS author_id,
-  (
-    SELECT json_agg(image_url)
-    FROM post_images
-    WHERE post_id = p.id
-  ) AS image_urls,
-  (
-    SELECT COUNT(*)::int
-    FROM likes
-    WHERE post_id = p.id
-  ) AS likes_count,
-  (
-    SELECT COUNT(*)::int
-    FROM comments
-    WHERE post_id = p.id
-  ) AS comments_count,
-  EXISTS (
-    SELECT 1 FROM likes WHERE post_id = p.id AND user_id = $1
-  ) AS is_liked
-FROM posts p
-JOIN users u ON u.id = p.user_id
-WHERE p.deleted_at IS NULL
-ORDER BY p.created_at DESC;
-`,
+  SELECT
+    p.id,
+    p.title,
+    p.description,
+    p.created_at,
+    p.updated_at,
+
+    u.name AS author_name,
+    u.avatar_url AS author_avatar_url,
+    u.id AS author_id,
+
+    c.id AS community_id,
+    c.title AS community_title,
+    c.avatar_url AS community_avatar_url,
+    (
+      SELECT json_agg(image_url)
+      FROM post_images
+      WHERE post_id = p.id
+    ) AS image_urls,
+
+    (
+      SELECT COUNT(*)::int
+      FROM likes
+      WHERE post_id = p.id
+    ) AS likes_count,
+
+    (
+      SELECT COUNT(*)::int
+      FROM comments
+      WHERE post_id = p.id
+    ) AS comments_count,
+
+    EXISTS (
+      SELECT 1 FROM likes WHERE post_id = p.id AND user_id = $1
+    ) AS is_liked
+
+  FROM posts p
+  JOIN users u ON u.id = p.user_id
+  LEFT JOIN communities c ON c.id = p.community_id
+  WHERE p.deleted_at IS NULL
+  ORDER BY p.created_at DESC;
+  `,
     [userId],
   );
 
-  return (result.rows as DatabasePost[]).map(dbPost => {
+  return result.rows.map(dbPost => {
     const {
       author_id,
       author_avatar_url,
@@ -61,6 +71,8 @@ ORDER BY p.created_at DESC;
       comments_count,
       is_liked,
       community_id,
+      community_title,
+      community_avatar_url,
       ...restData
     } = dbPost;
 
@@ -71,13 +83,20 @@ ORDER BY p.created_at DESC;
         avatarUrl: author_avatar_url,
         username: author_name,
       },
-      communityId: community_id,
       createdAt: created_at.toISOString(),
       updatedAt: updated_at.toISOString(),
       commentsCount: comments_count,
       likesCount: likes_count,
       imageUrls: image_urls,
       isLiked: is_liked,
+      community:
+        community_id && community_title
+          ? {
+              id: community_id,
+              title: community_title,
+              avatarUrl: community_avatar_url,
+            }
+          : null,
     };
   });
 };

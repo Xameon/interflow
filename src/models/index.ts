@@ -51,7 +51,7 @@ export type QueryParams<T = undefined> = [T] extends [undefined]
 /**
  * `T` = Response Type
  *
- * `D` = Params Type
+ * `D` = Payload Type
  */
 
 export type MutationOptions<T = void, D = undefined> = UseMutationOptions<

@@ -12,5 +12,7 @@ export const uploadFiles = async (files: File[]): Promise<string[]> => {
     return url;
   });
 
-  return Promise.all(uploadPromises);
+  const urls = await Promise.all(uploadPromises);
+
+  return urls;
 };
