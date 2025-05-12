@@ -70,13 +70,6 @@ export const CreatePostForm = () => {
           <Field.ErrorText>{errors.title?.message}</Field.ErrorText>
         </Field.Root>
 
-        <ImagesUploader
-          maxW='xl'
-          alignItems='stretch'
-          maxFiles={10}
-          onFileChange={({ acceptedFiles }) => setFiles(acceptedFiles)}
-        />
-
         <Field.Root invalid={!!errors.description}>
           <Field.Label>Description</Field.Label>
           <Textarea
@@ -85,6 +78,13 @@ export const CreatePostForm = () => {
           />
           <Field.ErrorText>{errors.description?.message}</Field.ErrorText>
         </Field.Root>
+
+        <ImagesUploader
+          maxW='xl'
+          alignItems='stretch'
+          maxFiles={10}
+          onFileChange={({ acceptedFiles }) => setFiles(acceptedFiles)}
+        />
 
         <Button type='submit' loading={loading} disabled={loading}>
           Create

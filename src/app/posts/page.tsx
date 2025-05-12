@@ -6,10 +6,7 @@ const PostsPage = async () => {
   return (
     <Box
       css={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1rem',
-        maxW: '4xl',
+        maxW: '6xl',
         mx: 'auto',
       }}
     >

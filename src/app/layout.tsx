@@ -15,11 +15,11 @@ export const metadata: Metadata = {
     'A social network for communities based on interests and hobbies.',
 };
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
   return (
     <html lang='en' suppressHydrationWarning>
       <body style={{ display: 'flex', flexDirection: 'column' }}>
@@ -37,4 +37,6 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;
