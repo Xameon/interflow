@@ -1,7 +1,15 @@
 'use client';
 
-import { Button, Flex, Heading, Input } from '@chakra-ui/react';
+import {
+  Button,
+  Heading,
+  Input,
+  Text,
+  VStack,
+  Link as ChakraLink,
+} from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 
 import { Field } from '@/components/ui/field';
@@ -12,6 +20,8 @@ import {
   SignUpCredentialsSchema,
 } from '@/models/auth.model';
 
+import { AuthForm } from './styled';
+
 const defaultValues: SignUpCredentials = {
   name: '',
   email: '',
@@ -19,7 +29,7 @@ const defaultValues: SignUpCredentials = {
   avatarUrl: null,
 };
 
-export function SignUpForm() {
+export const SignUpForm = () => {
   // ..................................................
   // Hook Form
 
@@ -51,16 +61,16 @@ export function SignUpForm() {
   // Render
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      style={{
-        marginTop: '5rem',
-        display: 'flex',
-        justifyContent: 'center',
-      }}
-    >
-      <Flex direction='column' width='100%' maxWidth='25rem' gap='1rem'>
-        <Heading textAlign='center'>Sign Up</Heading>
+    <AuthForm onSubmit={handleSubmit(onSubmit)} mt='8' mx='auto'>
+      <Heading
+        textAlign='center'
+        textStyle='2xl'
+        fontWeight='bolder'
+        color='colorPalette.700'
+      >
+        Sign Up
+      </Heading>
+      <VStack gap='4'>
         <Field
           label='Name'
           invalid={!!errors.name}
@@ -82,10 +92,16 @@ export function SignUpForm() {
         >
           <PasswordInput {...register('password')} />
         </Field>
-        <Button type='submit' loading={isSubmitting}>
-          Continue
-        </Button>
-      </Flex>
-    </form>
+      </VStack>
+      <Text textAlign='center' fontSize='sm' color='gray.600'>
+        {'Already have an account? '}
+        <ChakraLink asChild color='colorPalette.600'>
+          <Link href='/sign-in'>Sign In</Link>
+        </ChakraLink>
+      </Text>
+      <Button type='submit' loading={isSubmitting}>
+        Continue
+      </Button>
+    </AuthForm>
   );
-}
+};
