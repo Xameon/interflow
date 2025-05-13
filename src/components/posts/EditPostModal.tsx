@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
+import { MdEdit } from 'react-icons/md';
 
 import { useUpdatePost } from '@/hooks/posts/useUpdatePost';
 import { Post, UpdatePostPayload } from '@/models/posts.model';
@@ -54,7 +55,9 @@ export const EditPostModal = ({ post }: EditPostModalProps) => {
   return (
     <Dialog.Root initialFocusEl={() => null} onExitComplete={reset}>
       <Dialog.Trigger asChild>
-        <Button>Edit</Button>
+        <Button size='xs' variant='ghost' colorPalette='yellow'>
+          Edit <MdEdit />
+        </Button>
       </Dialog.Trigger>
       <Portal>
         <Dialog.Backdrop />

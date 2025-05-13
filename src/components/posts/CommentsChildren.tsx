@@ -1,12 +1,21 @@
 'use client';
 
-import { Button, Flex, For, Text } from '@chakra-ui/react';
+import {
+  Accordion,
+  Center,
+  Flex,
+  For,
+  Spinner,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import { useState } from 'react';
+import { MdErrorOutline } from 'react-icons/md';
 
 import { useComment } from '@/hooks/posts/useComment';
-import { useAuthContext } from '@/hooks/useAuthContext';
 
-import { CommentText } from './CommentText';
+import { Comment } from './Comment';
+import { EmptyState } from '../ui/empty-state';
 
 type CommentsChildrenProps = {
   postId: string;
@@ -20,19 +29,16 @@ export const CommentsChildren = ({
   childrenCount,
 }: CommentsChildrenProps) => {
   // ..................................................
-  // Contexts
-
-  const { userId } = useAuthContext();
-
-  // ..................................................
   // Local States
 
-  const [opened, setOpened] = useState<boolean>(false);
+  const [accordionValue, setAccordionValue] = useState<string[]>([]);
+
+  const opened = accordionValue[0] === 'replies';
 
   // ..................................................
   // API Hooks
 
-  const { data: commentChildren } = useComment({
+  const { data: commentChildren, isLoading: commentIsLoading } = useComment({
     params: { postId, commentId },
     options: { enabled: opened },
   });
@@ -40,38 +46,73 @@ export const CommentsChildren = ({
   // ..................................................
   // Functions
 
-  const handleToggleOpened = () => setOpened(prev => !prev);
+  const handleToggleOpened = () => {
+    if (opened) {
+      setAccordionValue([]);
+      return;
+    }
+
+    setAccordionValue(['replies']);
+  };
+
+  const renderComments = () => {
+    if (commentIsLoading)
+      return (
+        <Center>
+          <VStack>
+            <Spinner size='sm' color='colorPalette.700' />
+            <Text textStyle='sm' color='colorPalette.700'>
+              Comments are loading...
+            </Text>
+          </VStack>
+        </Center>
+      );
+
+    if (!commentChildren?.length) {
+      return (
+        <Center>
+          <EmptyState
+            icon={<MdErrorOutline />}
+            title='Oops, something went wrong'
+            description="Sorry, we can't display the comments right now. Please try again later."
+            size='sm'
+          />
+        </Center>
+      );
+    }
+
+    return (
+      <Flex direction='column' gap='4'>
+        <For each={commentChildren ?? []}>
+          {comment => <Comment key={comment.id} comment={comment} />}
+        </For>
+      </Flex>
+    );
+  };
 
   // ..................................................
   // Render
 
   return (
-    <Flex direction='column' gap='0.5rem' padding='1rem'>
-      <Button onClick={handleToggleOpened}>
-        {!opened ? `See replies (${childrenCount})` : 'Hide replies'}
-      </Button>
-      {opened && commentChildren && (
-        <For each={commentChildren}>
-          {child => (
-            <Flex key={child.id} direction='column' gap='0.5rem'>
-              <CommentText
-                postId={child.postId}
-                commentId={child.id}
-                commentAuthorId={child.author.id}
-                text={child.text}
-              />
-              <Text>Author: {child.author.username}</Text>
-              <Text>Created: {child.createdAt}</Text>
-              <Text>Updated: {child.updatedAt}</Text>
-              {userId === child.author.id && (
-                <Button w='fit-content' colorPalette='red'>
-                  Delete
-                </Button>
-              )}
-            </Flex>
-          )}
-        </For>
-      )}
-    </Flex>
+    <Accordion.Root
+      collapsible
+      variant='outline'
+      onValueChange={handleToggleOpened}
+      pl='6'
+    >
+      <Accordion.Item value='replies'>
+        <Accordion.ItemTrigger display='flex' justifyContent='start'>
+          <Text
+            textStyle='sm'
+            cursor='pointer'
+          >{`${!opened ? 'See replies' : 'Hide replies'} (${childrenCount})`}</Text>
+        </Accordion.ItemTrigger>
+        <Accordion.ItemContent>
+          <Accordion.ItemBody>
+            <VStack gap='4'>{renderComments()}</VStack>
+          </Accordion.ItemBody>
+        </Accordion.ItemContent>
+      </Accordion.Item>
+    </Accordion.Root>
   );
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { Editable, IconButton, Text } from '@chakra-ui/react';
+import { Editable, IconButton, Text, VStack } from '@chakra-ui/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { LuCheck, LuPencilLine, LuX } from 'react-icons/lu';
@@ -51,7 +51,11 @@ export const CommentText = ({
   // Render
 
   if (userId !== commentAuthorId) {
-    return <Text>{text}</Text>;
+    return (
+      <VStack justify='center' minH='8'>
+        <Text>{text}</Text>
+      </VStack>
+    );
   }
 
   return (
@@ -62,9 +66,10 @@ export const CommentText = ({
         setCommentText(text);
       }}
       maxW='full'
+      alignItems='start'
     >
       <Editable.Preview w='full' />
-      <Editable.Textarea resize='none' height='3rem' />
+      <Editable.Textarea h='4' />
       <Editable.Control>
         <Editable.EditTrigger asChild>
           <IconButton variant='ghost' size='xs'>

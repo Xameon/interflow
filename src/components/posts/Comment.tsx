@@ -1,8 +1,20 @@
 'use client';
 
-import { Button, Flex, Input, Text } from '@chakra-ui/react';
+import {
+  Button,
+  Flex,
+  Group,
+  HStack,
+  Icon,
+  IconButton,
+  Input,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { FaReply } from 'react-icons/fa';
+import { MdDelete } from 'react-icons/md';
 
 import { useCreatePostComment } from '@/hooks/posts/useCreatePostComment';
 import { useDeleteComment } from '@/hooks/posts/useDeleteComment';
@@ -11,12 +23,14 @@ import { Comment as IComment } from '@/models/comments.model';
 
 import { CommentsChildren } from './CommentsChildren';
 import { CommentText } from './CommentText';
+import { Avatar } from '../ui/avatar';
 
 type CommentProps = {
   comment: IComment;
+  isChild?: boolean;
 };
 
-export const Comment = ({ comment }: CommentProps) => {
+export const Comment = ({ comment, isChild }: CommentProps) => {
   // ..................................................
   // Contexts
 
@@ -25,6 +39,7 @@ export const Comment = ({ comment }: CommentProps) => {
   // ..................................................
   // Local States
 
+  const [replyInputOpened, setReplyInputOpened] = useState<boolean>(false);
   const [replyText, setReplyText] = useState<string>('');
 
   // ..................................................
@@ -32,7 +47,10 @@ export const Comment = ({ comment }: CommentProps) => {
 
   const queryClient = useQueryClient();
 
-  const { mutate: createComment } = useCreatePostComment({
+  const {
+    mutate: createCommentReplyAsync,
+    isPending: commentReplyCreationIsLoading,
+  } = useCreatePostComment({
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['posts', 'comments', { postId: comment.postId }],
@@ -57,16 +75,50 @@ export const Comment = ({ comment }: CommentProps) => {
   // Render
 
   return (
-    <Flex key={comment.id} direction='column' gap='0.5rem' bg='orange.50'>
-      <CommentText
-        postId={comment.postId}
-        commentId={comment.id}
-        commentAuthorId={comment.author.id}
-        text={comment.text}
-      />
-      <Text>Author: {comment.author.username}</Text>
-      <Text>Created: {comment.createdAt}</Text>
-      <Text>Updated: {comment.updatedAt}</Text>
+    <Flex key={comment.id} direction='column' gap='0.5rem'>
+      <VStack align='start'>
+        <HStack>
+          <Avatar
+            src={comment.author.avatarUrl ?? undefined}
+            variant='subtle'
+            colorPalette='gray'
+            size='xs'
+          />
+          <Text fontWeight='medium'>{comment.author.username}</Text>
+        </HStack>
+        <HStack w='full' justify='space-between' align='start'>
+          <CommentText
+            postId={comment.postId}
+            commentId={comment.id}
+            commentAuthorId={comment.author.id}
+            text={comment.text}
+          />
+          {userId === comment.author.id && (
+            <IconButton
+              size='xs'
+              variant='ghost'
+              colorPalette='red'
+              onClick={() =>
+                deleteComment({ postId: comment.postId, commentId: comment.id })
+              }
+            >
+              <Icon asChild>
+                <MdDelete />
+              </Icon>
+            </IconButton>
+          )}
+          {userId && !isChild && (
+            <Button
+              size='xs'
+              variant='ghost'
+              onClick={() => setReplyInputOpened(prev => !prev)}
+            >
+              {!replyInputOpened ? 'Reply' : 'Cancel'}
+            </Button>
+          )}
+        </HStack>
+      </VStack>
+
       {comment.childrenCount > 0 && (
         <CommentsChildren
           postId={comment.postId}
@@ -74,38 +126,42 @@ export const Comment = ({ comment }: CommentProps) => {
           childrenCount={comment.childrenCount}
         />
       )}
-      <form
-        onSubmit={e => {
-          e.preventDefault();
+      {!isChild && (
+        <form
+          onSubmit={async e => {
+            e.preventDefault();
 
-          createComment({
-            text: replyText,
-            postId: comment.postId,
-            parentCommentId: comment.id,
-          });
-        }}
-      >
-        {userId && (
-          <Flex gap='1rem'>
-            <Input
-              placeholder='Reply'
-              value={replyText}
-              onChange={e => setReplyText(e.target.value)}
-            />
-            <Button type='submit'>Reply</Button>
-          </Flex>
-        )}
-      </form>
-      {userId === comment.author.id && (
-        <Button
-          w='fit-content'
-          colorPalette='red'
-          onClick={() =>
-            deleteComment({ postId: comment.postId, commentId: comment.id })
-          }
+            await createCommentReplyAsync({
+              text: replyText,
+              postId: comment.postId,
+              parentCommentId: comment.id,
+            });
+
+            setReplyText('');
+          }}
         >
-          Delete
-        </Button>
+          {replyInputOpened && (
+            <Group w='full'>
+              <Input
+                placeholder='Your reply here...'
+                variant='flushed'
+                value={replyText}
+                onChange={e => setReplyText(e.target.value)}
+              />
+              <IconButton
+                size='xs'
+                type='submit'
+                variant='ghost'
+                disabled={!replyText || commentReplyCreationIsLoading}
+                loading={commentReplyCreationIsLoading}
+              >
+                <Icon asChild>
+                  <FaReply />
+                </Icon>
+              </IconButton>
+            </Group>
+          )}
+        </form>
       )}
     </Flex>
   );

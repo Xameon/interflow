@@ -13,12 +13,12 @@ import { EmptyState } from '../ui/empty-state';
 
 export const PostsList = () => {
   // ..................................................
-  // API Hooks
-
-  // ..................................................
   // Misc Hooks
 
   const router = useRouter();
+
+  // ..................................................
+  // API Hooks
 
   const { data: posts, isLoading: postsLoading } = usePosts({});
 
@@ -28,17 +28,16 @@ export const PostsList = () => {
   if (postsLoading) {
     return (
       <VStack
-        h='full'
         bg='gray.50'
         w='fit-content'
         mx='auto'
-        mt='32'
-        p='8'
+        mt='40'
+        p='16'
         rounded='lg'
         boxShadow='xs'
       >
-        <Spinner size='xl' borderWidth='4px' color='colorPalette.700' />
-        <Text textStyle='xl' fontWeight='medium' color='colorPalette.700'>
+        <Spinner size='xl' color='colorPalette.700' />
+        <Text textStyle='xl' color='colorPalette.700'>
           Posts are loading...
         </Text>
       </VStack>
@@ -74,6 +73,8 @@ export const PostsList = () => {
     );
 
   return (
-    <For each={posts}>{post => <PostCard key={post.id} post={post} />}</For>
+    <VStack mt='8' w='full'>
+      <For each={posts}>{post => <PostCard key={post.id} post={post} />}</For>
+    </VStack>
   );
 };

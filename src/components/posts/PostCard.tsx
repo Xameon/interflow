@@ -1,15 +1,20 @@
 'use client';
 
 import {
-  Box,
+  Blockquote,
   Button,
-  Center,
+  Code,
   Flex,
   Heading,
-  Image,
+  HStack,
+  Icon,
+  IconButton,
   Text,
 } from '@chakra-ui/react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { FaRegHeart, FaHeart, FaRegComment } from 'react-icons/fa6';
+import { MdDelete } from 'react-icons/md';
 
 import { useDeletePost } from '@/hooks/posts/useDeletePost';
 import { useDislikePost } from '@/hooks/posts/useDislikePost';
@@ -19,16 +24,30 @@ import { Post } from '@/models/posts.model';
 
 import { CommentsModal } from './CommentsModal';
 import { EditPostModal } from './EditPostModal';
+import { ImageCarousel } from '../ImageCarousel';
+import { Avatar } from '../ui/avatar';
+import { Tooltip } from '../ui/tooltip';
 
 type PostCardProps = {
   post: Post;
 };
+
+const getLikesLabel = (count: number) =>
+  `${count} like${count === 1 ? '' : 's'}`;
+
+const getCommentsLabel = (count: number) =>
+  `${count} comment${count === 1 ? '' : 's'}`;
 
 export const PostCard = ({ post }: PostCardProps) => {
   // ..................................................
   // Contexts
 
   const { userId } = useAuthContext();
+
+  // ..................................................
+  // Local States
+
+  const [commentsOpened, setCommentsOpened] = useState<boolean>(false);
 
   // ..................................................
   // API Hooks
@@ -70,60 +89,131 @@ export const PostCard = ({ post }: PostCardProps) => {
   };
 
   // ..................................................
+  // Variables
+
+  const hasImages = !!post.imageUrls?.length;
+
+  // ..................................................
   // Render
 
   return (
-    <Box
-      css={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.5rem',
-        padding: '1rem',
-        rounded: 'lg',
-        shadow: 'sm',
-        justifyContent: 'start',
-      }}
-    >
-      <Heading>{post.title}</Heading>
-      <Center>
-        {post.imageUrls?.[0] && (
-          <Image
-            src={post.imageUrls[0]}
-            alt='Post Image'
-            width='md'
-            height='md'
-          />
+    <>
+      <Flex
+        direction='column'
+        css={{
+          rounded: 'lg',
+          shadow: 'sm',
+          justifyContent: 'start',
+          w: 'full',
+          maxW: '2xl',
+          position: 'relative',
+        }}
+      >
+        {post.imageUrls && <ImageCarousel images={post.imageUrls} />}
+        {hasImages ? (
+          <Heading
+            css={{
+              position: 'absolute',
+              top: '4',
+              left: '4',
+              py: '1',
+              px: '3',
+              rounded: 'md',
+              color: 'colorPalette.900',
+              bg: 'rgba(255, 255, 255, 0.7)',
+              boxShadow: 'md',
+              backdropFilter: 'blur(2px)',
+            }}
+          >
+            {post.title}
+          </Heading>
+        ) : (
+          <Heading p='4' color='colorPalette.900'>
+            {post.title}
+          </Heading>
         )}
-      </Center>
-      <Text>{post.description}</Text>
-      <Text>Created: {new Date(post.createdAt).toLocaleString()}</Text>
-      {post.createdAt !== post.updatedAt && (
-        <Text>Updated: {new Date(post.updatedAt).toLocaleString()}</Text>
-      )}
-      <Text>Author: {post.author.username}</Text>
-      <Text>Likes: {post.likesCount}</Text>
-      <Flex justify='start' gap='1rem'>
-        <CommentsModal postId={post.id} commentsCount={post.commentsCount} />
-        <Button
-          disabled={likeLoading || dislikeLoading}
-          loading={likeLoading || dislikeLoading}
-          onClick={toggleLike}
-        >
-          {post.isLiked ? 'Dislike' : 'Like'}
-        </Button>
-        {userId === post.author.id && (
-          <>
-            <Button
-              disabled={deletePostLoading}
-              loading={deletePostLoading}
-              onClick={handleDeletePost}
-            >
-              Delete
-            </Button>
-            <EditPostModal post={post} />
-          </>
-        )}
+        <Flex direction='column' gap='4' p='4' pt={hasImages ? '4' : '0'}>
+          {!!post.description && (
+            <Blockquote.Root variant='solid'>
+              <Blockquote.Content>{post.description}</Blockquote.Content>
+            </Blockquote.Root>
+          )}
+          <HStack>
+            <HStack gap='1'>
+              <IconButton
+                disabled={likeLoading || dislikeLoading}
+                onClick={toggleLike}
+                variant='plain'
+              >
+                <Icon color='red.500' size='lg' asChild>
+                  {post.isLiked ? <FaHeart /> : <FaRegHeart />}
+                </Icon>
+              </IconButton>
+              <Text w='10' textStyle='sm'>
+                {getLikesLabel(post.likesCount)}
+              </Text>
+            </HStack>
+            <HStack gap='1'>
+              <IconButton
+                variant='plain'
+                onClick={() => setCommentsOpened(true)}
+              >
+                <Icon color='colorPalette.950' size='lg' asChild>
+                  <FaRegComment />
+                </Icon>
+              </IconButton>
+              <Text textStyle='sm'>{getCommentsLabel(post.commentsCount)}</Text>
+            </HStack>
+          </HStack>
+          <HStack justify='space-between'>
+            <HStack>
+              <Avatar
+                src={post.author.avatarUrl ?? undefined}
+                variant='subtle'
+                colorPalette='gray'
+                size='sm'
+              />
+              <Text fontWeight='medium'>{post.author.username}</Text>
+            </HStack>
+            <HStack gap='1'>
+              <Tooltip content={new Date(post.updatedAt).toLocaleString()}>
+                <Code colorPalette='gray' size='lg'>
+                  {post.createdAt === post.updatedAt ? (
+                    new Date(post.createdAt).toLocaleDateString()
+                  ) : (
+                    <>
+                      <Code size='md' pl='0' color='fg.muted'>
+                        updated
+                      </Code>
+                      {new Date(post.updatedAt).toLocaleDateString()}
+                    </>
+                  )}
+                </Code>
+              </Tooltip>
+              {userId === post.author.id && (
+                <>
+                  <EditPostModal post={post} />
+                  <Button
+                    size='xs'
+                    colorPalette='red'
+                    variant='ghost'
+                    disabled={deletePostLoading}
+                    loading={deletePostLoading}
+                    onClick={handleDeletePost}
+                  >
+                    Delete <MdDelete />
+                  </Button>
+                </>
+              )}
+            </HStack>
+          </HStack>
+        </Flex>
       </Flex>
-    </Box>
+      <CommentsModal
+        opened={commentsOpened}
+        postId={post.id}
+        onClose={() => setCommentsOpened(false)}
+      />
+    </>
   );
 };
