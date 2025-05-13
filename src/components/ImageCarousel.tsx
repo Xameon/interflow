@@ -18,7 +18,7 @@ type ImageCarouselProps = {
   images: string[];
 };
 
-export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
+export const ImageCarousel = ({ images }: ImageCarouselProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
