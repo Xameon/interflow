@@ -83,8 +83,8 @@ export const CommentsChildren = ({
 
     return (
       <Flex direction='column' gap='4'>
-        <For each={commentChildren ?? []}>
-          {comment => <Comment key={comment.id} comment={comment} />}
+        <For each={commentChildren}>
+          {comment => <Comment key={comment.id} comment={comment} isChild />}
         </For>
       </Flex>
     );
