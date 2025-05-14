@@ -8,6 +8,7 @@ const PostsPage = async () => {
       css={{
         maxW: '6xl',
         mx: 'auto',
+        mt: '8',
       }}
     >
       <PostsList />

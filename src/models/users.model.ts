@@ -9,6 +9,7 @@ export const UserSchema = z.object({
   email: z.string().email(),
   avatarUrl: z.string().url().nullable(),
   createdAt: z.string().datetime(),
+  isFollowed: z.boolean(),
 });
 
 export type User = z.infer<typeof UserSchema>;
@@ -29,6 +30,37 @@ export const DatabaseUserSchema = z.object({
 });
 
 export type DatabaseUser = z.infer<typeof DatabaseUserSchema>;
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Database User Stats
+
+export const DatabaseUserStatsSchema = z.object({
+  followers_count: z.number(),
+  following_count: z.number(),
+  communities_count: z.number(),
+  followed_communities_count: z.number(),
+});
+
+export type DatabaseUserStats = z.infer<typeof DatabaseUserStatsSchema>;
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Database User Stats
+
+export const UserStatsSchema = z.object({
+  userId: z.string().uuid(),
+  followersCount: z.number(),
+  followingCount: z.number(),
+  communitiesCount: z.number(),
+  followedCommunitiesCount: z.number(),
+});
+
+export type UserStats = z.infer<typeof UserStatsSchema>;
 
 // #endregion
 // ..................................................

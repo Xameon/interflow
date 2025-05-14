@@ -8,6 +8,7 @@ import { UserSchema } from './users.model';
 export const SignUpCredentialsSchema = UserSchema.omit({
   id: true,
   createdAt: true,
+  isFollowed: true,
 }).merge(z.object({ password: z.string().min(3) }));
 
 export type SignUpCredentials = z.infer<typeof SignUpCredentialsSchema>;

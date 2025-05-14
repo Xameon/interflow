@@ -1,3 +1,5 @@
+import qs from 'qs';
+
 import {
   Comment,
   CreateCommentPayload,
@@ -11,8 +13,17 @@ import { api } from './api';
 // ..................................................
 // #region Posts
 
-export const getPosts = async () => {
-  const res = await api.get<Post[]>('posts');
+export type GetPostsParams = {
+  userId?: string;
+  communityId?: string;
+  categoryId?: string[];
+};
+
+export const getPosts = async (params?: GetPostsParams) => {
+  const res = await api.get<Post[]>('posts', {
+    params,
+    paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
+  });
 
   return res;
 };

@@ -11,7 +11,19 @@ import { usePosts } from '@/hooks/posts/usePosts';
 import { PostCard } from './PostCard';
 import { EmptyState } from '../ui/empty-state';
 
-export const PostsList = () => {
+type PostsListProps = {
+  userId?: string;
+  communityId?: string;
+  categoryIds?: string[];
+  disabled?: boolean;
+};
+
+export const PostsList = ({
+  userId,
+  communityId,
+  categoryIds,
+  disabled,
+}: PostsListProps) => {
   // ..................................................
   // Misc Hooks
 
@@ -20,10 +32,17 @@ export const PostsList = () => {
   // ..................................................
   // API Hooks
 
-  const { data: posts, isLoading: postsLoading } = usePosts({});
+  const { data: posts, isLoading: postsLoading } = usePosts({
+    params: { userId, communityId, categoryId: categoryIds },
+    options: { enabled: !disabled },
+  });
 
   // ..................................................
   // Render
+
+  if (disabled) {
+    return null;
+  }
 
   if (postsLoading) {
     return (
@@ -73,7 +92,7 @@ export const PostsList = () => {
     );
 
   return (
-    <VStack mt='8' w='full'>
+    <VStack w='full' gap='4'>
       <For each={posts}>{post => <PostCard key={post.id} post={post} />}</For>
     </VStack>
   );

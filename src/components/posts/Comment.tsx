@@ -8,7 +8,6 @@ import {
   Icon,
   IconButton,
   Input,
-  Text,
   VStack,
 } from '@chakra-ui/react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -23,7 +22,7 @@ import { Comment as IComment } from '@/models/comments.model';
 
 import { CommentsChildren } from './CommentsChildren';
 import { CommentText } from './CommentText';
-import { Avatar } from '../ui/avatar';
+import { UserLabel } from '../UserLabel';
 
 type CommentProps = {
   comment: IComment;
@@ -77,15 +76,11 @@ export const Comment = ({ comment, isChild }: CommentProps) => {
   return (
     <Flex key={comment.id} direction='column' gap='0.5rem'>
       <VStack align='start'>
-        <HStack>
-          <Avatar
-            src={comment.author.avatarUrl ?? undefined}
-            variant='subtle'
-            colorPalette='gray'
-            size='xs'
-          />
-          <Text fontWeight='medium'>{comment.author.username}</Text>
-        </HStack>
+        <UserLabel
+          userId={comment.author.id}
+          username={comment.author.username}
+          avatarUrl={comment.author.avatarUrl}
+        />
         <HStack w='full' justify='space-between' align='start'>
           <CommentText
             postId={comment.postId}

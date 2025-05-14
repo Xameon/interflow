@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { updateComment } from '@/lib/api/posts';
+import { updateComment } from '@/lib/api/posts.api';
 import { MutationOptions } from '@/models';
 import { UpdateCommentPayload } from '@/models/comments.model';
 

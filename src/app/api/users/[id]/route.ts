@@ -4,18 +4,37 @@ import pool from '@/lib/db';
 import { APIRequestContext } from '@/models';
 import { DatabaseUser, User } from '@/models/users.model';
 
-export async function GET(
-  _: NextRequest,
+export const GET = async (
+  req: NextRequest,
   { params }: APIRequestContext<{ id: string }>,
-) {
-  const id = (await params).id;
+) => {
+  const currentUserId = req.headers.get('x-user-id');
+  const targetUserId = (await params).id;
 
-  const res = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+  const res = await pool.query('SELECT * FROM users WHERE id = $1', [
+    targetUserId,
+  ]);
 
   const user = res.rows[0] as DatabaseUser | undefined;
 
-  if (!user)
+  if (!user) {
     return NextResponse.json({ message: 'User not found' }, { status: 404 });
+  }
+
+  let isFollowed = false;
+
+  if (currentUserId && currentUserId !== targetUserId) {
+    const subscriptionCheck = await pool.query(
+      `
+      SELECT 1 FROM subscriptions
+      WHERE follower_id = $1 AND following_id = $2
+      LIMIT 1
+      `,
+      [currentUserId, targetUserId],
+    );
+
+    isFollowed = (subscriptionCheck?.rowCount || 0) > 0;
+  }
 
   const { id: userId, name, email, avatar_url, created_at } = user;
 
@@ -25,5 +44,6 @@ export async function GET(
     email,
     avatarUrl: avatar_url,
     createdAt: created_at,
+    isFollowed,
   });
-}
+};

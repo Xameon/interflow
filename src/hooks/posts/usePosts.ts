@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getPosts } from '@/lib/api/posts';
+import { getPosts, GetPostsParams } from '@/lib/api/posts.api';
 import { QueryParams } from '@/models';
 
-export const usePosts = ({ options }: QueryParams) => {
+export const usePosts = ({ params, options }: QueryParams<GetPostsParams>) => {
   return useQuery({
-    queryFn: () => getPosts().then(res => res.data),
+    queryFn: () => getPosts(params).then(res => res.data),
     queryKey: ['posts'],
     ...options,
   });

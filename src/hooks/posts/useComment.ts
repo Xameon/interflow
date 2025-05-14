@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getComment, GetCommentParams } from '@/lib/api/posts';
+import { getComment, GetCommentParams } from '@/lib/api/posts.api';
 import { QueryParams } from '@/models';
 
 export const useComment = ({

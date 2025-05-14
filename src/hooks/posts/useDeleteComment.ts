@@ -1,6 +1,6 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query';
 
-import { deleteComment } from '@/lib/api/posts';
+import { deleteComment } from '@/lib/api/posts.api';
 import { DeleteCommentPayload } from '@/models/comments.model';
 
 export const useDeleteComment = (

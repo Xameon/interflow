@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getComments } from '@/lib/api/posts';
+import { getComments } from '@/lib/api/posts.api';
 import { QueryParams } from '@/models';
 
 export const usePostComments = ({

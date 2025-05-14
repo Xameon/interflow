@@ -11,52 +11,97 @@ import {
 // ..................................................
 // #region Get Posts
 
-const getPostsFromDB = async (userId: string | null): Promise<Post[]> => {
+const getPostsFromDB = async ({
+  headerUserId,
+  queryUserId,
+  communityId,
+  categoryIds,
+}: {
+  headerUserId: string | null;
+  queryUserId: string | null;
+  communityId: string | null;
+  categoryIds: string[] | null;
+}): Promise<Post[]> => {
+  const values: (string | null)[] = [headerUserId];
+  let paramIndex = 2;
+  const filters: string[] = [];
+
+  if (queryUserId) {
+    filters.push(`p.user_id = $${paramIndex}`);
+    values.push(queryUserId);
+    paramIndex++;
+  }
+
+  if (communityId) {
+    filters.push(`p.community_id = $${paramIndex}`);
+    values.push(communityId);
+    paramIndex++;
+  }
+
+  let joinCategoryFilter = '';
+  if (categoryIds && categoryIds.length > 0) {
+    const placeholders = categoryIds
+      .map((_, i) => `$${paramIndex + i}`)
+      .join(', ');
+    joinCategoryFilter = `
+      JOIN community_categories cc ON cc.community_id = p.community_id
+      AND cc.category_id IN (${placeholders})
+    `;
+    values.push(...categoryIds);
+    paramIndex += categoryIds.length;
+  }
+
+  const whereClause = `
+    WHERE p.deleted_at IS NULL
+    ${filters.length > 0 ? 'AND ' + filters.join(' AND ') : ''}
+  `;
+
   const result = await pool.query<DatabasePost>(
     `
-  SELECT
-    p.id,
-    p.title,
-    p.description,
-    p.created_at,
-    p.updated_at,
+    SELECT
+      p.id,
+      p.title,
+      p.description,
+      p.created_at,
+      p.updated_at,
 
-    u.name AS author_name,
-    u.avatar_url AS author_avatar_url,
-    u.id AS author_id,
+      u.name AS author_name,
+      u.avatar_url AS author_avatar_url,
+      u.id AS author_id,
 
-    c.id AS community_id,
-    c.title AS community_title,
-    c.avatar_url AS community_avatar_url,
-    (
-      SELECT json_agg(image_url)
-      FROM post_images
-      WHERE post_id = p.id
-    ) AS image_urls,
+      c.id AS community_id,
+      c.title AS community_title,
+      c.avatar_url AS community_avatar_url,
+      (
+        SELECT json_agg(image_url)
+        FROM post_images
+        WHERE post_id = p.id
+      ) AS image_urls,
 
-    (
-      SELECT COUNT(*)::int
-      FROM likes
-      WHERE post_id = p.id
-    ) AS likes_count,
+      (
+        SELECT COUNT(*)::int
+        FROM likes
+        WHERE post_id = p.id
+      ) AS likes_count,
 
-    (
-      SELECT COUNT(*)::int
-      FROM comments
-      WHERE post_id = p.id
-    ) AS comments_count,
+      (
+        SELECT COUNT(*)::int
+        FROM comments
+        WHERE post_id = p.id
+      ) AS comments_count,
 
-    EXISTS (
-      SELECT 1 FROM likes WHERE post_id = p.id AND user_id = $1
-    ) AS is_liked
+      EXISTS (
+        SELECT 1 FROM likes WHERE post_id = p.id AND user_id = $1
+      ) AS is_liked
 
-  FROM posts p
-  JOIN users u ON u.id = p.user_id
-  LEFT JOIN communities c ON c.id = p.community_id
-  WHERE p.deleted_at IS NULL
-  ORDER BY p.created_at DESC;
-  `,
-    [userId],
+    FROM posts p
+    JOIN users u ON u.id = p.user_id
+    LEFT JOIN communities c ON c.id = p.community_id
+    ${joinCategoryFilter}
+    ${whereClause}
+    ORDER BY p.created_at DESC;
+    `,
+    values,
   );
 
   return result.rows.map(dbPost => {
@@ -102,17 +147,26 @@ const getPostsFromDB = async (userId: string | null): Promise<Post[]> => {
 };
 
 export const GET = async (request: NextRequest) => {
-  const userId = request.headers.get('x-user-id');
+  const headerUserId = request.headers.get('x-user-id');
+  const { searchParams } = new URL(request.url);
+
+  const queryUserId = searchParams.get('userId') || null;
+  const communityId = searchParams.get('communityId') || null;
+  const categoryIds = searchParams.getAll('categoryId');
+  const validCategoryIds = categoryIds.length > 0 ? categoryIds : null;
 
   try {
-    const posts = await getPostsFromDB(userId);
+    const posts = await getPostsFromDB({
+      headerUserId,
+      queryUserId,
+      communityId,
+      categoryIds: validCategoryIds,
+    });
 
     return NextResponse.json(posts, { status: 200 });
-  } catch {
+  } catch (error) {
     return NextResponse.json(
-      {
-        message: 'Failed to fetch posts',
-      },
+      { message: 'Failed to fetch posts', error },
       { status: 500 },
     );
   }

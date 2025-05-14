@@ -25,8 +25,8 @@ import { Post } from '@/models/posts.model';
 import { CommentsModal } from './CommentsModal';
 import { EditPostModal } from './EditPostModal';
 import { ImageCarousel } from '../ImageCarousel';
-import { Avatar } from '../ui/avatar';
 import { Tooltip } from '../ui/tooltip';
+import { UserLabel } from '../UserLabel';
 
 type PostCardProps = {
   post: Post;
@@ -166,15 +166,11 @@ export const PostCard = ({ post }: PostCardProps) => {
             </HStack>
           </HStack>
           <HStack justify='space-between'>
-            <HStack>
-              <Avatar
-                src={post.author.avatarUrl ?? undefined}
-                variant='subtle'
-                colorPalette='gray'
-                size='sm'
-              />
-              <Text fontWeight='medium'>{post.author.username}</Text>
-            </HStack>
+            <UserLabel
+              userId={post.author.id}
+              username={post.author.username}
+              avatarUrl={post.author.avatarUrl}
+            />
             <HStack gap='1'>
               <Tooltip content={new Date(post.updatedAt).toLocaleString()}>
                 <Code colorPalette='gray' size='lg'>
