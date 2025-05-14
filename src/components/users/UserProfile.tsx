@@ -174,7 +174,7 @@ export const UserProfile = ({ userId }: UserProfileProps) => {
         </VStack>
       </Flex>
       <Divider />
-      <PostsList userId={user?.id} disabled={!user} />
+      <PostsList params={{ userId: user?.id }} disabled={!user} />
     </VStack>
   );
 };

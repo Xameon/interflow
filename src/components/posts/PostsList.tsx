@@ -12,18 +12,16 @@ import { PostCard } from './PostCard';
 import { EmptyState } from '../ui/empty-state';
 
 type PostsListProps = {
-  userId?: string;
-  communityId?: string;
-  categoryIds?: string[];
+  params?: {
+    userId?: string;
+    communityId?: string;
+    categoryIds?: string[];
+  };
+
   disabled?: boolean;
 };
 
-export const PostsList = ({
-  userId,
-  communityId,
-  categoryIds,
-  disabled,
-}: PostsListProps) => {
+export const PostsList = ({ params, disabled }: PostsListProps) => {
   // ..................................................
   // Misc Hooks
 
@@ -33,7 +31,7 @@ export const PostsList = ({
   // API Hooks
 
   const { data: posts, isLoading: postsLoading } = usePosts({
-    params: { userId, communityId, categoryId: categoryIds },
+    params: { ...params, categoryId: params?.categoryIds },
     options: { enabled: !disabled },
   });
 
