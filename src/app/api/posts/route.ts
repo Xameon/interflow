@@ -15,14 +15,14 @@ type GetPostsFromDB = {
   headerUserId: string | null;
   authorId: string | null;
   communityId: string | null;
-  categoryIds: string[] | null;
+  onlyFromFollowed: boolean | null;
 };
 
 const getPostsFromDB = async ({
   headerUserId,
   authorId,
   communityId,
-  categoryIds,
+  onlyFromFollowed = false,
 }: GetPostsFromDB): Promise<Post[]> => {
   const values: (string | null)[] = [headerUserId];
   let paramIndex = 2;
@@ -40,17 +40,24 @@ const getPostsFromDB = async ({
     paramIndex++;
   }
 
-  let joinCategoryFilter = '';
-  if (categoryIds && categoryIds.length > 0) {
-    const placeholders = categoryIds
-      .map((_, i) => `$${paramIndex + i}`)
-      .join(', ');
-    joinCategoryFilter = `
-      JOIN community_categories cc ON cc.community_id = p.community_id
-      AND cc.category_id IN (${placeholders})
-    `;
-    values.push(...categoryIds);
-    paramIndex += categoryIds.length;
+  if (headerUserId && onlyFromFollowed) {
+    filters.push(`
+      (
+        p.user_id IN (
+          SELECT following_id
+          FROM subscriptions
+          WHERE follower_id = $${paramIndex}
+        )
+        OR
+        p.community_id IN (
+          SELECT community_id
+          FROM community_subscriptions
+          WHERE user_id = $${paramIndex}
+        )
+      )
+    `);
+    values.push(headerUserId);
+    paramIndex++;
   }
 
   const whereClause = `
@@ -74,6 +81,7 @@ const getPostsFromDB = async ({
       c.id AS community_id,
       c.title AS community_title,
       c.avatar_url AS community_avatar_url,
+
       (
         SELECT json_agg(image_url)
         FROM post_images
@@ -93,13 +101,14 @@ const getPostsFromDB = async ({
       ) AS comments_count,
 
       EXISTS (
-        SELECT 1 FROM likes WHERE post_id = p.id AND user_id = $1
+        SELECT 1
+        FROM likes
+        WHERE post_id = p.id AND user_id = $1
       ) AS is_liked
 
     FROM posts p
     JOIN users u ON u.id = p.user_id
     LEFT JOIN communities c ON c.id = p.community_id
-    ${joinCategoryFilter}
     ${whereClause}
     ORDER BY p.created_at DESC;
     `,
@@ -152,17 +161,26 @@ export const GET = async (request: NextRequest) => {
   const headerUserId = request.headers.get('x-user-id');
   const { searchParams } = new URL(request.url);
 
-  const authorId = searchParams.get('authorId') || null;
-  const communityId = searchParams.get('communityId') || null;
-  const categoryIds = searchParams.getAll('categoryId');
-  const validCategoryIds = categoryIds.length > 0 ? categoryIds : null;
+  const authorId = searchParams.get('authorId');
+  const communityId = searchParams.get('communityId');
+  const onlyFromFollowed = searchParams.get('onlyFromFollowed');
+
+  let validOnlyFromFollowed = null;
+
+  if (onlyFromFollowed === 'true') {
+    validOnlyFromFollowed = true;
+  }
+
+  if (onlyFromFollowed === 'false') {
+    validOnlyFromFollowed = false;
+  }
 
   try {
     const posts = await getPostsFromDB({
       headerUserId,
       authorId,
       communityId,
-      categoryIds: validCategoryIds,
+      onlyFromFollowed: validOnlyFromFollowed,
     });
 
     return NextResponse.json(posts, { status: 200 });

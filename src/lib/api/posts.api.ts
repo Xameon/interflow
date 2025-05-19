@@ -16,7 +16,7 @@ import { api } from './api';
 export type GetPostsParams = {
   authorId?: string;
   communityId?: string;
-  categoryId?: string[];
+  onlyFromFollowed?: boolean;
 };
 
 export const getPosts = async (params?: GetPostsParams) => {

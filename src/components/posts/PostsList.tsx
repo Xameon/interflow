@@ -15,7 +15,7 @@ type PostsListProps = {
   params?: {
     authorId?: string;
     communityId?: string;
-    categoryIds?: string[];
+    onlyFromFollowed?: boolean;
   };
 
   disabled?: boolean;
@@ -31,7 +31,7 @@ export const PostsList = ({ params, disabled }: PostsListProps) => {
   // API Hooks
 
   const { data: posts, isLoading: postsLoading } = usePosts({
-    params: { ...params, categoryId: params?.categoryIds },
+    params,
     options: { enabled: !disabled },
   });
 
