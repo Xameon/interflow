@@ -35,6 +35,9 @@ export const NavHeader = () => {
           <Button asChild variant='plain' size='lg'>
             <Link href='/communities'>Communities</Link>
           </Button>
+          <Button asChild variant='plain' size='lg'>
+            <Link href='/users'>Search Users</Link>
+          </Button>
         </Flex>
         <NavActions />
       </Flex>

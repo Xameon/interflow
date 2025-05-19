@@ -35,6 +35,20 @@ export type DatabaseUser = z.infer<typeof DatabaseUserSchema>;
 // ..................................................
 
 // ..................................................
+// #region User Metadata
+
+export const UserMetadataSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  avatarUrl: z.string().url().nullable(),
+});
+
+export type UserMetadata = z.infer<typeof UserMetadataSchema>;
+
+// #endregion
+// ..................................................
+
+// ..................................................
 // #region Database User Stats
 
 export const DatabaseUserStatsSchema = z.object({

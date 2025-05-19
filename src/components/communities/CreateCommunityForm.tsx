@@ -1,6 +1,7 @@
 'use client';
 
 import { Button, Flex, Heading, Input, Textarea } from '@chakra-ui/react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -45,8 +46,15 @@ export const CreateCommunityForm = () => {
   const { mutateAsync: uploadFilesAsync, isPending: uploadingFilesIsLoading } =
     useUploadFiles();
 
-  const { mutate: createCommunity, isPending: creatingCommunityIsLoading } =
-    useCreateCommunity();
+  const {
+    mutateAsync: createCommunityAsync,
+    isPending: creatingCommunityIsLoading,
+  } = useCreateCommunity();
+
+  // ..................................................
+  // Misc Hooks
+
+  const router = useRouter();
 
   // ..................................................
   // Functions
@@ -58,7 +66,9 @@ export const CreateCommunityForm = () => {
       avatarUrl = (await uploadFilesAsync([avatar]))[0];
     }
 
-    createCommunity({ ...payload, avatarUrl });
+    const res = await createCommunityAsync({ ...payload, avatarUrl });
+
+    router.push(`/communities/${res.data.id}`);
   };
 
   // ..................................................

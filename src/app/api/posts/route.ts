@@ -214,39 +214,41 @@ export const POST = async (request: NextRequest) => {
   const { title, description, imageUrls, communityId } = payload;
 
   try {
-    const permissionRes = await pool.query(
-      `
-      SELECT 
-        c.author_id,
-        c.only_author_can_post,
-        EXISTS (
-          SELECT 1 FROM community_subscriptions cs
-          WHERE cs.community_id = c.id AND cs.user_id = $1
-        ) AS is_subscribed
-      FROM communities c
-      WHERE c.id = $2 AND c.deleted_at IS NULL;
-      `,
-      [userId, communityId],
-    );
-
-    if (permissionRes.rowCount === 0) {
-      return NextResponse.json(
-        { message: 'Community not found' },
-        { status: 404 },
+    if (communityId) {
+      const permissionRes = await pool.query(
+        `
+        SELECT 
+          c.author_id,
+          c.only_author_can_post,
+          EXISTS (
+            SELECT 1 FROM community_subscriptions cs
+            WHERE cs.community_id = c.id AND cs.user_id = $1
+          ) AS is_subscribed
+        FROM communities c
+        WHERE c.id = $2 AND c.deleted_at IS NULL;
+        `,
+        [userId, communityId],
       );
-    }
 
-    const { author_id, only_author_can_post, is_subscribed } =
-      permissionRes.rows[0];
+      if (permissionRes.rowCount === 0) {
+        return NextResponse.json(
+          { message: 'Community not found' },
+          { status: 404 },
+        );
+      }
 
-    const isAuthor = author_id === userId;
-    const canPost = !only_author_can_post && is_subscribed;
+      const { author_id, only_author_can_post, is_subscribed } =
+        permissionRes.rows[0];
 
-    if (!isAuthor && !canPost) {
-      return NextResponse.json(
-        { message: 'You are not allowed to post in this community' },
-        { status: 403 },
-      );
+      const isAuthor = author_id === userId;
+      const canPost = !only_author_can_post && is_subscribed;
+
+      if (!isAuthor && !canPost) {
+        return NextResponse.json(
+          { message: 'You are not allowed to post in this community' },
+          { status: 403 },
+        );
+      }
     }
 
     const res = await pool.query(
@@ -255,7 +257,7 @@ export const POST = async (request: NextRequest) => {
       VALUES ($1, $2, $3, $4) 
       RETURNING id;
       `,
-      [userId, title, description, communityId],
+      [userId, title, description, communityId ?? null],
     );
 
     const postId = res.rows[0].id;

@@ -1,6 +1,27 @@
-import { UpdateUserPayload, User, UserStats } from '@/models/users.model';
+import {
+  UpdateUserPayload,
+  User,
+  UserMetadata,
+  UserStats,
+} from '@/models/users.model';
 
 import { api } from './api';
+
+// ..................................................
+// #region Get Users
+
+export type GetUsersParams = {
+  name?: string;
+};
+
+export const getUsers = async (params: GetUsersParams) => {
+  const res = await api.get<UserMetadata[]>('users', { params });
+
+  return res;
+};
+
+// #endregion
+// ..................................................
 
 // ..................................................
 // #region Get User By ID

@@ -1,6 +1,7 @@
 'use client';
 
 import { Button, Flex, Input, Textarea } from '@chakra-ui/react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -41,8 +42,13 @@ export const CreatePostForm = () => {
   const { mutateAsync: uploadFilesAsync, isPending: uploadingFilesIsLoading } =
     useUploadFiles();
 
-  const { mutate: createPost, isPending: creatingPostIsLoading } =
+  const { mutateAsync: createPostAsync, isPending: creatingPostIsLoading } =
     useCreatePost();
+
+  // ..................................................
+  // Misc Hooks
+
+  const router = useRouter();
 
   // ..................................................
   // Functions
@@ -54,7 +60,9 @@ export const CreatePostForm = () => {
       imageUrls = await uploadFilesAsync(files);
     }
 
-    createPost({ ...payload, imageUrls });
+    await createPostAsync({ ...payload, imageUrls });
+
+    router.push('/posts');
   };
 
   // ..................................................
