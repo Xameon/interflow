@@ -16,7 +16,13 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { FiUserMinus, FiUserPlus } from 'react-icons/fi';
 import { HiOutlineUserGroup } from 'react-icons/hi';
-import { MdErrorOutline, MdLockOpen, MdLockOutline } from 'react-icons/md';
+import {
+  MdDelete,
+  MdEdit,
+  MdErrorOutline,
+  MdLockOpen,
+  MdLockOutline,
+} from 'react-icons/md';
 
 import { useCommunity } from '@/hooks/communities/useCommunity';
 import { useFollowCommunity } from '@/hooks/communities/useFollowCommunity';
@@ -206,29 +212,41 @@ export const CommunityProfile = ({ communityId }: CommunityProfileProps) => {
             )}
           </Badge>
         </HStack>
-        {community.onlyAuthorCanPost ? (
-          <HStack>
-            <Badge size='md' colorPalette='yellow'>
-              <Center gap='1'>
-                <Text>Only Owner can Post</Text>
-                <Icon asChild size='md'>
-                  <MdLockOutline />
-                </Icon>
-              </Center>
-            </Badge>
-          </HStack>
-        ) : (
-          <HStack>
-            <Badge size='md' colorPalette='green'>
-              <Center gap='1'>
-                <Text>Members can Post</Text>
-                <Icon asChild size='md'>
-                  <MdLockOpen />
-                </Icon>
-              </Center>
-            </Badge>
-          </HStack>
-        )}
+        <HStack>
+          {community.onlyAuthorCanPost ? (
+            <HStack>
+              <Badge size='md' colorPalette='yellow'>
+                <Center gap='1'>
+                  <Text>Only Owner can Post</Text>
+                  <Icon asChild size='md'>
+                    <MdLockOutline />
+                  </Icon>
+                </Center>
+              </Badge>
+            </HStack>
+          ) : (
+            <HStack>
+              <Badge size='md' colorPalette='green'>
+                <Center gap='1'>
+                  <Text>Members can Post</Text>
+                  <Icon asChild size='md'>
+                    <MdLockOpen />
+                  </Icon>
+                </Center>
+              </Badge>
+            </HStack>
+          )}
+          {userId === community.author.id && (
+            <HStack>
+              <Button size='xs' variant='ghost' colorPalette='yellow'>
+                Edit <MdEdit />
+              </Button>
+              <Button size='xs' colorPalette='red' variant='ghost'>
+                Delete <MdDelete />
+              </Button>
+            </HStack>
+          )}
+        </HStack>
       </HStack>
       <Divider />
       <PostsList params={{ communityId: community.id }} disabled={!community} />

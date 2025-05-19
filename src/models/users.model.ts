@@ -64,3 +64,17 @@ export type UserStats = z.infer<typeof UserStatsSchema>;
 
 // #endregion
 // ..................................................
+
+// ..................................................
+// #region Update User Payload
+
+export const UpdateUserPayloadSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  avatarUrl: z.string().url().nullable(),
+});
+
+export type UpdateUserPayload = z.infer<typeof UpdateUserPayloadSchema>;
+
+// #endregion
+// ..................................................

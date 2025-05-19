@@ -32,6 +32,10 @@ const protectedRoutes = [
     methods: ['POST', 'DELETE'],
   },
   {
+    pathname: '/api/users/:id',
+    methods: ['PUT'],
+  },
+  {
     pathname: '/api/users/:id/followers',
     methods: ['POST', 'DELETE'],
   },

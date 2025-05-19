@@ -13,7 +13,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { FiUserPlus, FiExternalLink, FiUserMinus } from 'react-icons/fi';
-import { MdLockOutline, MdLockOpen, MdDelete, MdEdit } from 'react-icons/md';
+import { MdLockOutline, MdLockOpen } from 'react-icons/md';
 
 import { useFollowCommunity } from '@/hooks/communities/useFollowCommunity';
 import { useUnfollowCommunity } from '@/hooks/communities/useUnfollowCommunity';
@@ -21,6 +21,8 @@ import { useAuthContext } from '@/hooks/useAuthContext';
 import { Community } from '@/models/communities.model';
 
 import { CommunityLabel } from '../CommunityLabel';
+import { DeleteButton } from '../DeleteButton';
+import { EditButton } from '../EditButton';
 import { UserLabel } from '../UserLabel';
 
 type CommunityCardProps = {
@@ -172,12 +174,8 @@ export const CommunityCard = ({ community }: CommunityCardProps) => {
           </HStack>
           {userId === community.author.id && (
             <HStack>
-              <Button size='xs' variant='ghost' colorPalette='yellow'>
-                Edit <MdEdit />
-              </Button>
-              <Button size='xs' colorPalette='red' variant='ghost'>
-                Delete <MdDelete />
-              </Button>
+              <EditButton />
+              <DeleteButton />
             </HStack>
           )}
         </HStack>

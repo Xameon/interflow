@@ -11,54 +11,74 @@ import {
 } from '@chakra-ui/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { MdEdit } from 'react-icons/md';
 
 import { useUpdatePost } from '@/hooks/posts/useUpdatePost';
 import { Post, UpdatePostPayload } from '@/models/posts.model';
 
+import { CloseButton } from '../ui/close-button';
+
 type EditPostModalProps = {
   post: Post;
+  opened?: boolean;
+  onClose?: () => void;
 };
 
-export const EditPostModal = ({ post }: EditPostModalProps) => {
+export const EditPostModal = ({
+  post,
+  opened,
+  onClose,
+}: EditPostModalProps) => {
   // ..................................................
   // Hooks Form
 
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
-  } = useForm<UpdatePostPayload>({ defaultValues: post });
+  } = useForm<UpdatePostPayload>({
+    defaultValues: {
+      id: post.id,
+      title: post.title,
+      description: post.description,
+      imageUrls: post.imageUrls,
+    },
+  });
 
   // ..................................................
   // API Hooks
 
   const queryClient = useQueryClient();
 
-  const { mutate: updatePost, isPending: updatePostIsLoading } = useUpdatePost({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-    },
-  });
+  const { mutateAsync: updatePostAsync, isPending: updatePostIsLoading } =
+    useUpdatePost({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['posts'] });
+      },
+    });
 
   // ..................................................
   // Functions
 
-  const onSubmit = (payload: UpdatePostPayload) => {
-    updatePost(payload);
+  const onSubmit = async (payload: UpdatePostPayload) => {
+    await updatePostAsync(payload);
+
+    onClose?.();
   };
 
   // ..................................................
   // Render
 
   return (
-    <Dialog.Root initialFocusEl={() => null} onExitComplete={reset}>
-      <Dialog.Trigger asChild>
-        <Button size='xs' variant='ghost' colorPalette='yellow'>
-          Edit <MdEdit />
-        </Button>
-      </Dialog.Trigger>
+    <Dialog.Root
+      open={opened}
+      initialFocusEl={() => null}
+      onExitComplete={onClose}
+      onOpenChange={({ open }) => {
+        if (!open) onClose?.();
+      }}
+      size='lg'
+      unmountOnExit
+    >
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
@@ -82,6 +102,8 @@ export const EditPostModal = ({ post }: EditPostModalProps) => {
                     <Textarea
                       placeholder='Your Description Here...'
                       {...register('description')}
+                      minH='36'
+                      maxH='xs'
                     />
                     <Field.ErrorText>
                       {errors.description?.message}
@@ -104,6 +126,9 @@ export const EditPostModal = ({ post }: EditPostModalProps) => {
                 </Button>
               </Dialog.Footer>
             </form>
+            <Dialog.CloseTrigger asChild>
+              <CloseButton size='sm' />
+            </Dialog.CloseTrigger>
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>

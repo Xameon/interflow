@@ -3,7 +3,6 @@
 import {
   Badge,
   Blockquote,
-  Button,
   Flex,
   Heading,
   HStack,
@@ -25,6 +24,8 @@ import { Post } from '@/models/posts.model';
 import { CommentsModal } from './CommentsModal';
 import { EditPostModal } from './EditPostModal';
 import { CommunityLabel } from '../CommunityLabel';
+import { DeleteButton } from '../DeleteButton';
+import { EditButton } from '../EditButton';
 import { ImageCarousel } from '../ImageCarousel';
 import { Tooltip } from '../ui/tooltip';
 import { UserLabel } from '../UserLabel';
@@ -48,6 +49,7 @@ export const PostCard = ({ post }: PostCardProps) => {
   // ..................................................
   // Local States
 
+  const [postEditorOpened, setPostEditorOpened] = useState<boolean>(false);
   const [commentsOpened, setCommentsOpened] = useState<boolean>(false);
 
   // ..................................................
@@ -171,17 +173,14 @@ export const PostCard = ({ post }: PostCardProps) => {
               </Tooltip>
               {userId === post.author.id && (
                 <>
-                  <EditPostModal post={post} />
-                  <Button
-                    size='xs'
-                    colorPalette='red'
-                    variant='ghost'
+                  <EditButton onClick={() => setPostEditorOpened(true)} />
+                  <DeleteButton
                     disabled={deletePostLoading}
                     loading={deletePostLoading}
                     onClick={handleDeletePost}
                   >
                     Delete <MdDelete />
-                  </Button>
+                  </DeleteButton>
                 </>
               )}
             </HStack>
@@ -219,6 +218,11 @@ export const PostCard = ({ post }: PostCardProps) => {
         opened={commentsOpened}
         postId={post.id}
         onClose={() => setCommentsOpened(false)}
+      />
+      <EditPostModal
+        opened={postEditorOpened}
+        post={post}
+        onClose={() => setPostEditorOpened(false)}
       />
     </>
   );
