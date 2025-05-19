@@ -12,15 +12,15 @@ const protectedRoutes = [
     methods: ['POST'],
   },
   {
-    pathname: '/api/posts/:id',
+    pathname: '/api/posts/:postId',
     methods: ['PUT', 'DELETE'],
   },
   {
-    pathname: '/api/posts/:id/like',
+    pathname: '/api/posts/:postId/like',
     methods: ['POST', 'DELETE'],
   },
   {
-    pathname: '/api/posts/:id/comments',
+    pathname: '/api/posts/:postId/comments',
     methods: ['POST', 'DELETE'],
   },
   {
@@ -28,7 +28,11 @@ const protectedRoutes = [
     methods: ['POST'],
   },
   {
-    pathname: '/api/communities/subscriptions',
+    pathname: '/api/communities/:communityId',
+    methods: ['PUT', 'DELETE'],
+  },
+  {
+    pathname: '/api/communities/:communityId/subscriptions',
     methods: ['POST', 'DELETE'],
   },
   {

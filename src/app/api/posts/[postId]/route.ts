@@ -109,7 +109,10 @@ export const DELETE = async (
   }
 
   if (post.user_id !== userId) {
-    return NextResponse.json('No rights to delete', { status: 403 });
+    return NextResponse.json(
+      { message: 'No rights to delete' },
+      { status: 403 },
+    );
   }
 
   await pool.query('UPDATE posts SET deleted_at = NOW() WHERE id = $1', [

@@ -19,6 +19,24 @@ export type CreateCommunityPayload = z.infer<
 // ..................................................
 
 // ..................................................
+// #region Create Community
+
+export const UpdateCommunityPayloadSchema = z.object({
+  id: z.string().uuid(),
+  description: z.string(),
+  avatarUrl: z.string().url().nullable(),
+  categoryIds: z.array(z.string().uuid()),
+  onlyAuthorCanPost: z.boolean(),
+});
+
+export type UpdateCommunityPayload = z.infer<
+  typeof UpdateCommunityPayloadSchema
+>;
+
+// #endregion
+// ..................................................
+
+// ..................................................
 // #region Database Community
 
 export const DatabaseCommunitySchema = z.object({

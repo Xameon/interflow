@@ -4,6 +4,7 @@ import {
   Category,
   Community,
   CreateCommunityPayload,
+  UpdateCommunityPayload,
 } from '@/models/communities.model';
 
 import { api } from './api';
@@ -49,6 +50,31 @@ export const getCommunity = async (id: string) => {
   const res = await api.get<Community>(`communities/${id}`);
 
   return res;
+};
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Update Community
+
+export const updateCommunity = async ({
+  id,
+  ...payload
+}: UpdateCommunityPayload) => {
+  const res = await api.put<{ message: string }>(`communities/${id}`, payload);
+
+  return res;
+};
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Delete Community
+
+export const deleteCommunity = async (id: string) => {
+  await api.delete<void>(`communities/${id}`);
 };
 
 // #endregion

@@ -14,15 +14,10 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { FiUserMinus, FiUserPlus } from 'react-icons/fi';
 import { HiOutlineUserGroup } from 'react-icons/hi';
-import {
-  MdDelete,
-  MdEdit,
-  MdErrorOutline,
-  MdLockOpen,
-  MdLockOutline,
-} from 'react-icons/md';
+import { MdErrorOutline, MdLockOpen, MdLockOutline } from 'react-icons/md';
 
 import { useCommunity } from '@/hooks/communities/useCommunity';
 import { useFollowCommunity } from '@/hooks/communities/useFollowCommunity';
@@ -33,6 +28,10 @@ import { Divider } from '../Divider';
 import { PostsList } from '../posts/PostsList';
 import { EmptyState } from '../ui/empty-state';
 import { UserLabel } from '../UserLabel';
+import { DeleteCommunityModal } from './DeleteCommunityModal';
+import { DeleteButton } from '../DeleteButton';
+import { EditButton } from '../EditButton';
+import { UpdateCommunityModal } from './UpdateCommunityModal';
 
 type CommunityProfileProps = {
   communityId: string;
@@ -43,6 +42,14 @@ export const CommunityProfile = ({ communityId }: CommunityProfileProps) => {
   // Contexts
 
   const { userId } = useAuthContext();
+
+  // ..................................................
+  // Local States
+
+  const [updateCommunityModalOpened, setUpdateCommunityModalOpened] =
+    useState<boolean>(false);
+  const [deleteCommunityModalOpened, setDeleteCommunityModalOpened] =
+    useState<boolean>(false);
 
   // ..................................................
   // API Hooks
@@ -117,139 +124,168 @@ export const CommunityProfile = ({ communityId }: CommunityProfileProps) => {
   }
 
   return (
-    <VStack mt='8' gap='4'>
-      <Flex
-        align='center'
-        gap='8'
-        mx='auto'
-        mdDown={{
-          flexDirection: 'column',
-        }}
-      >
-        {community.avatarUrl ? (
-          <Image
-            src={community.avatarUrl}
-            alt='Community Avatar'
-            h='48'
-            w='48'
-            rounded='full'
-            objectFit='cover'
-          />
-        ) : (
-          <Icon
-            asChild
-            bg='gray.200'
-            h='48'
-            w='48'
-            color='gray.600'
-            rounded='full'
-            p='4'
+    <>
+      <VStack mt='8' gap='4' w='full'>
+        <Center w='full'>
+          <Flex
+            align='center'
+            justify='center'
+            gap='8'
+            w='full'
+            mdDown={{
+              flexDirection: 'column',
+            }}
           >
-            <HiOutlineUserGroup />
-          </Icon>
-        )}
+            {community.avatarUrl ? (
+              <Image
+                src={community.avatarUrl}
+                alt='Community Avatar'
+                h='48'
+                w='48'
+                rounded='full'
+                objectFit='cover'
+              />
+            ) : (
+              <Icon
+                asChild
+                bg='gray.200'
+                h='48'
+                w='48'
+                color='gray.600'
+                rounded='full'
+                p='4'
+              >
+                <HiOutlineUserGroup />
+              </Icon>
+            )}
 
-        <VStack gap='4' w='xs'>
-          <Text textStyle='4xl' fontWeight='medium' color='colorPalette.900'>
-            {community.title}
-          </Text>
-
-          {userId && userId !== community.author.id && (
-            <Button
-              variant='subtle'
-              loading={subscriptionLoading}
-              disabled={subscriptionLoading}
-              onClick={handleToggleSubscription}
-              colorPalette={!community.isSubscribed ? 'current' : 'red'}
-              w='full'
-            >
-              {!community.isSubscribed ? (
+            <VStack gap='4' align='center'>
+              <Text
+                textStyle='4xl'
+                fontWeight='medium'
+                color='colorPalette.900'
+                textAlign='center'
+                w='full'
+              >
+                {community.title}
+              </Text>
+              {userId === community.author.id && (
+                <HStack maxW='2xs'>
+                  <EditButton
+                    size='sm'
+                    w='24'
+                    variant='subtle'
+                    onClick={() => setUpdateCommunityModalOpened(true)}
+                  />
+                  <DeleteButton
+                    size='sm'
+                    w='24'
+                    variant='subtle'
+                    onClick={() => setDeleteCommunityModalOpened(true)}
+                  />
+                </HStack>
+              )}
+              {userId && userId !== community.author.id && (
+                <Button
+                  variant='subtle'
+                  loading={subscriptionLoading}
+                  disabled={subscriptionLoading}
+                  onClick={handleToggleSubscription}
+                  colorPalette={!community.isSubscribed ? 'current' : 'red'}
+                  w='full'
+                >
+                  {!community.isSubscribed ? (
+                    <>
+                      Join <FiUserPlus />
+                    </>
+                  ) : (
+                    <>
+                      Leave <FiUserMinus />
+                    </>
+                  )}
+                </Button>
+              )}
+            </VStack>
+          </Flex>
+        </Center>
+        <Text p='4'>{community.description}</Text>
+        <Divider />
+        <Heading textAlign='start' w='full' ml='16'>
+          Categories
+        </Heading>
+        <Flex wrap='wrap' gap='2'>
+          {community.categories.map(c => (
+            <Badge key={c.id}>{c.name}</Badge>
+          ))}
+        </Flex>
+        <Divider />
+        <HStack justify='space-between' w='full'>
+          <HStack gap='4'>
+            <UserLabel
+              userId={community.author.id}
+              username={community.author.username}
+              avatarUrl={community.author.avatarUrl}
+            />
+            <Badge colorPalette='gray'>
+              {community.createdAt === community.updatedAt ? (
                 <>
-                  Join <FiUserPlus />
+                  <Badge size='md' color='fg.muted'>
+                    created
+                  </Badge>
+                  {new Date(community.createdAt).toLocaleDateString()}
                 </>
               ) : (
                 <>
-                  Leave <FiUserMinus />
+                  <Badge size='md' color='fg.muted'>
+                    updated
+                  </Badge>
+                  {new Date(community.updatedAt).toLocaleDateString()}
                 </>
               )}
-            </Button>
-          )}
-        </VStack>
-      </Flex>
-      <Text p='4'>{community.description}</Text>
-      <Divider />
-      <Heading textAlign='start' w='full' ml='16'>
-        Categories
-      </Heading>
-      <Flex wrap='wrap' gap='2'>
-        {community.categories.map(c => (
-          <Badge key={c.id}>{c.name}</Badge>
-        ))}
-      </Flex>
-      <Divider />
-      <HStack justify='space-between' w='full'>
-        <HStack gap='4'>
-          <UserLabel
-            userId={community.author.id}
-            username={community.author.username}
-            avatarUrl={community.author.avatarUrl}
-          />
-          <Badge colorPalette='gray'>
-            {community.createdAt === community.updatedAt ? (
-              <>
-                <Badge size='md' color='fg.muted'>
-                  created
+            </Badge>
+          </HStack>
+          <HStack>
+            {community.onlyAuthorCanPost ? (
+              <HStack>
+                <Badge size='md' colorPalette='yellow'>
+                  <Center gap='1'>
+                    <Text>Only Owner can Post</Text>
+                    <Icon asChild size='md'>
+                      <MdLockOutline />
+                    </Icon>
+                  </Center>
                 </Badge>
-                {new Date(community.createdAt).toLocaleDateString()}
-              </>
+              </HStack>
             ) : (
-              <>
-                <Badge size='md' color='fg.muted'>
-                  updated
+              <HStack>
+                <Badge size='md' colorPalette='green'>
+                  <Center gap='1'>
+                    <Text>Members can Post</Text>
+                    <Icon asChild size='md'>
+                      <MdLockOpen />
+                    </Icon>
+                  </Center>
                 </Badge>
-                {new Date(community.updatedAt).toLocaleDateString()}
-              </>
+              </HStack>
             )}
-          </Badge>
+          </HStack>
         </HStack>
-        <HStack>
-          {community.onlyAuthorCanPost ? (
-            <HStack>
-              <Badge size='md' colorPalette='yellow'>
-                <Center gap='1'>
-                  <Text>Only Owner can Post</Text>
-                  <Icon asChild size='md'>
-                    <MdLockOutline />
-                  </Icon>
-                </Center>
-              </Badge>
-            </HStack>
-          ) : (
-            <HStack>
-              <Badge size='md' colorPalette='green'>
-                <Center gap='1'>
-                  <Text>Members can Post</Text>
-                  <Icon asChild size='md'>
-                    <MdLockOpen />
-                  </Icon>
-                </Center>
-              </Badge>
-            </HStack>
-          )}
-          {userId === community.author.id && (
-            <HStack>
-              <Button size='xs' variant='ghost' colorPalette='yellow'>
-                Edit <MdEdit />
-              </Button>
-              <Button size='xs' colorPalette='red' variant='ghost'>
-                Delete <MdDelete />
-              </Button>
-            </HStack>
-          )}
-        </HStack>
-      </HStack>
-      <Divider />
-      <PostsList params={{ communityId: community.id }} disabled={!community} />
-    </VStack>
+        <Divider />
+        <PostsList
+          params={{ communityId: community.id }}
+          disabled={!community}
+        />
+      </VStack>
+      <UpdateCommunityModal
+        community={community}
+        opened={updateCommunityModalOpened}
+        onClose={() => setUpdateCommunityModalOpened(false)}
+      />
+      <DeleteCommunityModal
+        communityId={community.id}
+        opened={deleteCommunityModalOpened}
+        onClose={() => setDeleteCommunityModalOpened(false)}
+      />
+    </>
   );
 };
