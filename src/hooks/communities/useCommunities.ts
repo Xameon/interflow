@@ -11,7 +11,7 @@ export const useCommunities = ({
   options,
 }: QueryParams<GetCommunitiesParams>) => {
   return useQuery({
-    queryKey: ['communities'],
+    queryKey: ['communities', params],
     queryFn: () => getCommunities(params).then(res => res.data),
     ...options,
   });

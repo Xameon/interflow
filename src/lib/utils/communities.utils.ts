@@ -12,6 +12,7 @@ type GetCommunitiesFromDBParams = {
   authorId?: string | null;
   onlyAuthorCanPost?: boolean | null;
   communityId?: string;
+  search?: string | null;
 };
 
 export const getCommunitiesFromDB = async ({
@@ -21,6 +22,7 @@ export const getCommunitiesFromDB = async ({
   authorId,
   onlyAuthorCanPost,
   communityId,
+  search,
 }: GetCommunitiesFromDBParams): Promise<Community[]> => {
   const conditions: string[] = ['c.deleted_at IS NULL'];
   const params: (string | string[] | boolean | null)[] = [];
@@ -50,7 +52,13 @@ export const getCommunitiesFromDB = async ({
   }
 
   if (categoryIds?.length) {
-    conditions.push(`cat.id = ANY($${paramIndex}::uuid[])`);
+    conditions.push(`
+      EXISTS (
+        SELECT 1 FROM community_categories cc2
+        WHERE cc2.community_id = c.id
+        AND cc2.category_id = ANY($${paramIndex}::uuid[])
+      )
+    `);
     params.push(categoryIds);
     paramIndex++;
   }
@@ -63,13 +71,19 @@ export const getCommunitiesFromDB = async ({
 
   if (onlyAuthorCanPost != null) {
     conditions.push(`c.only_author_can_post = $${paramIndex}`);
-    params.push(onlyAuthorCanPost ?? null);
+    params.push(onlyAuthorCanPost);
     paramIndex++;
   }
 
   if (communityId) {
     conditions.push(`c.id = $${paramIndex}`);
     params.push(communityId);
+    paramIndex++;
+  }
+
+  if (search) {
+    conditions.push(`c.title ILIKE '%' || $${paramIndex} || '%'`);
+    params.push(search.toLowerCase().trim());
     paramIndex++;
   }
 

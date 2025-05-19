@@ -84,7 +84,7 @@ export const CommunityCard = ({ community }: CommunityCardProps) => {
 
   return (
     <>
-      <Card.Root overflow='hidden' mx='auto' w='full' maxW='xl' size='lg'>
+      <Card.Root overflow='hidden' mx='auto' w='full' maxW='2xl' size='lg'>
         <Card.Body display='flex' flexDirection='column' gap='4' w='full'>
           <Card.Title mb='2'>
             <HStack justify='space-between'>

@@ -19,6 +19,7 @@ export const GET = async (req: NextRequest) => {
   const followerId = searchParams.get('followerId');
 
   let onlyAuthorCanPost = null;
+
   const onlyAuthorCanPostParam = searchParams.get('onlyAuthorCanPost');
 
   if (onlyAuthorCanPostParam === 'true') {
@@ -30,13 +31,15 @@ export const GET = async (req: NextRequest) => {
   }
 
   const categoryIds = searchParams.getAll('categoryId');
-  const validCategoryIds = categoryIds.length > 0 ? categoryIds : null;
+
+  const search = searchParams.get('search');
 
   try {
     const communities = await getCommunitiesFromDB({
+      search,
       userId,
       authorId,
-      categoryIds: validCategoryIds,
+      categoryIds,
       followerId,
       onlyAuthorCanPost,
     });

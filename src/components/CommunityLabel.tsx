@@ -41,7 +41,9 @@ export const CommunityLabel = ({
         colorPalette='gray'
         size={avatarSize ?? 'sm'}
         cursor={!disableLink ? 'pointer' : 'auto'}
-        onClick={() => router.push(`/communities/${communityId}`)}
+        onClick={() => {
+          if (!disableLink) router.push(`/communities/${communityId}`);
+        }}
       />
       {!disableLink ? (
         <ChakraLink asChild color='colorPalette.900' fontWeight='medium'>

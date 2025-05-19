@@ -13,16 +13,18 @@ import { api } from './api';
 // #region Get Communities
 
 export type GetCommunitiesParams = {
-  followerId?: string;
-  categoryIds?: string[];
-  authorId?: string;
-  onlyAuthorCanPost?: boolean;
+  search?: string | null;
+  followerId?: string | null;
+  categoryId?: string[] | null;
+  authorId?: string | null;
+  onlyAuthorCanPost?: boolean | null;
 };
 
 export const getCommunities = async (params: GetCommunitiesParams) => {
   const res = await api.get<Community[]>('communities', {
     params,
-    paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
+    paramsSerializer: params =>
+      qs.stringify(params, { arrayFormat: 'repeat', skipNulls: true }),
   });
 
   return res;
