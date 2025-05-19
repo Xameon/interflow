@@ -16,7 +16,7 @@ export const PostSchema = z.object({
   }),
   community: z
     .object({
-      id: z.string().uuid().nullable(),
+      id: z.string().uuid(),
       title: z.string(),
       avatarUrl: z.string().url().nullable(),
     })
@@ -39,6 +39,7 @@ export const PostPayloadSchema = z.object({
   title: z.string(),
   description: z.string(),
   imageUrls: z.array(z.string()).nullable(),
+  communityId: z.string().uuid().nullish(),
 });
 
 export type PostPayload = z.infer<typeof PostPayloadSchema>;

@@ -14,7 +14,7 @@ import { api } from './api';
 // #region Posts
 
 export type GetPostsParams = {
-  userId?: string;
+  authorId?: string;
   communityId?: string;
   categoryId?: string[];
 };

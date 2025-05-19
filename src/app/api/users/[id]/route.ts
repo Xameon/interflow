@@ -11,39 +11,46 @@ export const GET = async (
   const currentUserId = req.headers.get('x-user-id');
   const targetUserId = (await params).id;
 
-  const res = await pool.query('SELECT * FROM users WHERE id = $1', [
-    targetUserId,
-  ]);
+  try {
+    const res = await pool.query('SELECT * FROM users WHERE id = $1', [
+      targetUserId,
+    ]);
 
-  const user = res.rows[0] as DatabaseUser | undefined;
+    const user = res.rows[0] as DatabaseUser | undefined;
 
-  if (!user) {
-    return NextResponse.json({ message: 'User not found' }, { status: 404 });
-  }
+    if (!user) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
 
-  let isFollowed = false;
+    let isFollowed = false;
 
-  if (currentUserId && currentUserId !== targetUserId) {
-    const subscriptionCheck = await pool.query(
-      `
+    if (currentUserId && currentUserId !== targetUserId) {
+      const subscriptionCheck = await pool.query(
+        `
       SELECT 1 FROM subscriptions
       WHERE follower_id = $1 AND following_id = $2
       LIMIT 1
       `,
-      [currentUserId, targetUserId],
+        [currentUserId, targetUserId],
+      );
+
+      isFollowed = (subscriptionCheck?.rowCount || 0) > 0;
+    }
+
+    const { id: userId, name, email, avatar_url, created_at } = user;
+
+    return NextResponse.json<User>({
+      id: userId,
+      name,
+      email,
+      avatarUrl: avatar_url,
+      createdAt: created_at,
+      isFollowed,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Failed to get user', error },
+      { status: 500 },
     );
-
-    isFollowed = (subscriptionCheck?.rowCount || 0) > 0;
   }
-
-  const { id: userId, name, email, avatar_url, created_at } = user;
-
-  return NextResponse.json<User>({
-    id: userId,
-    name,
-    email,
-    avatarUrl: avatar_url,
-    createdAt: created_at,
-    isFollowed,
-  });
 };

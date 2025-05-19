@@ -148,9 +148,11 @@ export const UserProfile = ({ userId }: UserProfileProps) => {
           </Text>
           {userStats && (
             <HStack gap='4'>
-              <Text>Followers {userStats.followersCount}</Text>
-              <Text>Followings {userStats.followingCount}</Text>
-              <Text>
+              <Text color='fg.muted'>Followers {userStats.followersCount}</Text>
+              <Text color='fg.muted'>
+                Followings {userStats.followingCount}
+              </Text>
+              <Text color='fg.muted'>
                 Communities{' '}
                 {userStats.communitiesCount +
                   userStats.followedCommunitiesCount}
@@ -174,7 +176,7 @@ export const UserProfile = ({ userId }: UserProfileProps) => {
         </VStack>
       </Flex>
       <Divider />
-      <PostsList params={{ userId: user?.id }} disabled={!user} />
+      <PostsList params={{ authorId: user?.id }} disabled={!user} />
     </VStack>
   );
 };

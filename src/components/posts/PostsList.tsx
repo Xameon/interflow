@@ -13,7 +13,7 @@ import { EmptyState } from '../ui/empty-state';
 
 type PostsListProps = {
   params?: {
-    userId?: string;
+    authorId?: string;
     communityId?: string;
     categoryIds?: string[];
   };
@@ -80,8 +80,8 @@ export const PostsList = ({ params, disabled }: PostsListProps) => {
         description='However, you can create the first post by clicking the button below.'
         size='lg'
       >
-        <Button variant='subtle' onClick={() => router.push('posts/new')}>
-          Create{' '}
+        <Button variant='subtle' onClick={() => router.push('/posts/new')}>
+          Create
           <Icon asChild size='sm'>
             <IoMdAdd />
           </Icon>

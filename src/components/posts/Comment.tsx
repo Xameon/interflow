@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  Badge,
   Button,
   Flex,
   Group,
@@ -76,11 +77,16 @@ export const Comment = ({ comment, isChild }: CommentProps) => {
   return (
     <Flex key={comment.id} direction='column' gap='0.5rem'>
       <VStack align='start'>
-        <UserLabel
-          userId={comment.author.id}
-          username={comment.author.username}
-          avatarUrl={comment.author.avatarUrl}
-        />
+        <HStack>
+          <UserLabel
+            userId={comment.author.id}
+            username={comment.author.username}
+            avatarUrl={comment.author.avatarUrl}
+          />
+          <Badge colorPalette='gray'>
+            {new Date(comment.createdAt).toLocaleDateString()}
+          </Badge>
+        </HStack>
         <HStack w='full' justify='space-between' align='start'>
           <CommentText
             postId={comment.postId}

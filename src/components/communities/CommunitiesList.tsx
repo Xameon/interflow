@@ -1,6 +1,6 @@
 'use client';
 
-import { For, Text } from '@chakra-ui/react';
+import { Flex, For, Spinner, Text, VStack } from '@chakra-ui/react';
 
 import { useCommunities } from '@/hooks/communities/useCommunities';
 
@@ -11,23 +11,42 @@ export const CommunitiesList = () => {
   // ..................................................
   // API Hooks
 
-  const { data: communities, isLoading: communitiesLoading } = useCommunities(
-    {},
-  );
+  const { data: communities, isLoading: communitiesLoading } = useCommunities({
+    params: {},
+  });
 
   // ..................................................
   // Render
 
   if (communitiesLoading) {
-    return <Text>Loading...</Text>;
+    return (
+      <VStack
+        bg='gray.50'
+        w='fit-content'
+        mx='auto'
+        mt='40'
+        p='16'
+        rounded='lg'
+        boxShadow='xs'
+      >
+        <Spinner size='xl' color='colorPalette.700' />
+        <Text textStyle='xl' color='colorPalette.700'>
+          Communities are loading...
+        </Text>
+      </VStack>
+    );
   }
 
   if (!communities || communities.length === 0)
     return <EmptyState title='No Communities found :(' />;
 
   return (
-    <For each={communities}>
-      {community => <CommunityCard key={community.id} community={community} />}
-    </For>
+    <Flex w='full' direction='column' gap='4' mt='8' wrap='wrap'>
+      <For each={communities}>
+        {community => (
+          <CommunityCard key={community.id} community={community} />
+        )}
+      </For>
+    </Flex>
   );
 };

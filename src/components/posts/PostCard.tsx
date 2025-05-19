@@ -1,9 +1,9 @@
 'use client';
 
 import {
+  Badge,
   Blockquote,
   Button,
-  Code,
   Flex,
   Heading,
   HStack,
@@ -24,6 +24,7 @@ import { Post } from '@/models/posts.model';
 
 import { CommentsModal } from './CommentsModal';
 import { EditPostModal } from './EditPostModal';
+import { CommunityLabel } from '../CommunityLabel';
 import { ImageCarousel } from '../ImageCarousel';
 import { Tooltip } from '../ui/tooltip';
 import { UserLabel } from '../UserLabel';
@@ -138,6 +139,53 @@ export const PostCard = ({ post }: PostCardProps) => {
               <Blockquote.Content>{post.description}</Blockquote.Content>
             </Blockquote.Root>
           )}
+          <HStack justify='space-between'>
+            <HStack gap='4'>
+              <UserLabel
+                userId={post.author.id}
+                username={post.author.username}
+                avatarUrl={post.author.avatarUrl}
+              />
+              {post.community && (
+                <CommunityLabel
+                  communityId={post.community.id}
+                  communityTitle={post.community.title}
+                  communityAvatarUrl={post.community.avatarUrl}
+                />
+              )}
+            </HStack>
+            <HStack gap='1'>
+              <Tooltip content={new Date(post.updatedAt).toLocaleString()}>
+                <Badge colorPalette='gray' size='lg'>
+                  {post.createdAt === post.updatedAt ? (
+                    new Date(post.createdAt).toLocaleDateString()
+                  ) : (
+                    <>
+                      <Badge size='md' color='fg.muted'>
+                        updated
+                      </Badge>
+                      {new Date(post.updatedAt).toLocaleDateString()}
+                    </>
+                  )}
+                </Badge>
+              </Tooltip>
+              {userId === post.author.id && (
+                <>
+                  <EditPostModal post={post} />
+                  <Button
+                    size='xs'
+                    colorPalette='red'
+                    variant='ghost'
+                    disabled={deletePostLoading}
+                    loading={deletePostLoading}
+                    onClick={handleDeletePost}
+                  >
+                    Delete <MdDelete />
+                  </Button>
+                </>
+              )}
+            </HStack>
+          </HStack>
           <HStack>
             <HStack gap='1'>
               <IconButton
@@ -163,44 +211,6 @@ export const PostCard = ({ post }: PostCardProps) => {
                 </Icon>
               </IconButton>
               <Text textStyle='sm'>{getCommentsLabel(post.commentsCount)}</Text>
-            </HStack>
-          </HStack>
-          <HStack justify='space-between'>
-            <UserLabel
-              userId={post.author.id}
-              username={post.author.username}
-              avatarUrl={post.author.avatarUrl}
-            />
-            <HStack gap='1'>
-              <Tooltip content={new Date(post.updatedAt).toLocaleString()}>
-                <Code colorPalette='gray' size='lg'>
-                  {post.createdAt === post.updatedAt ? (
-                    new Date(post.createdAt).toLocaleDateString()
-                  ) : (
-                    <>
-                      <Code size='md' pl='0' color='fg.muted'>
-                        updated
-                      </Code>
-                      {new Date(post.updatedAt).toLocaleDateString()}
-                    </>
-                  )}
-                </Code>
-              </Tooltip>
-              {userId === post.author.id && (
-                <>
-                  <EditPostModal post={post} />
-                  <Button
-                    size='xs'
-                    colorPalette='red'
-                    variant='ghost'
-                    disabled={deletePostLoading}
-                    loading={deletePostLoading}
-                    onClick={handleDeletePost}
-                  >
-                    Delete <MdDelete />
-                  </Button>
-                </>
-              )}
             </HStack>
           </HStack>
         </Flex>

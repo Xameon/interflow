@@ -1,19 +1,22 @@
 'use client';
 
-import { Button, Field, Flex, Input, Textarea } from '@chakra-ui/react';
+import { Button, Flex, Input, Textarea } from '@chakra-ui/react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
 import { useUploadFiles } from '@/hooks/firebase/useUploadFiles';
 import { useCreatePost } from '@/hooks/posts/useCreatePost';
 import { PostPayload } from '@/models/posts.model';
 
 import { ImagesUploader } from '../ImagesUploader';
+import { SelectUserCommunities } from './SelectUserCommunities';
+import { Field } from '../ui/field';
 
 const defaultValues = {
   title: '',
   description: '',
   imageUrls: null,
+  communityId: null,
 };
 
 export const CreatePostForm = () => {
@@ -26,6 +29,7 @@ export const CreatePostForm = () => {
   // Hook Form
 
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
@@ -64,20 +68,36 @@ export const CreatePostForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Flex gap='1rem' direction='column'>
-        <Field.Root invalid={!!errors.title}>
-          <Field.Label>Title</Field.Label>
+        <Field
+          invalid={!!errors.title}
+          label='Title'
+          errorText={errors.title?.message}
+        >
           <Input {...register('title', { required: 'Title is Required' })} />
-          <Field.ErrorText>{errors.title?.message}</Field.ErrorText>
-        </Field.Root>
+        </Field>
 
-        <Field.Root invalid={!!errors.description}>
-          <Field.Label>Description</Field.Label>
+        <Field
+          invalid={!!errors.description}
+          label='Description'
+          errorText={errors.description?.message}
+        >
           <Textarea
             placeholder='Your Description Here...'
             {...register('description')}
           />
-          <Field.ErrorText>{errors.description?.message}</Field.ErrorText>
-        </Field.Root>
+        </Field>
+
+        <Field label='Community'>
+          <Controller
+            control={control}
+            name='communityId'
+            render={({ field }) => (
+              <SelectUserCommunities
+                onChange={value => field.onChange(value)}
+              />
+            )}
+          />
+        </Field>
 
         <ImagesUploader
           maxW='xl'

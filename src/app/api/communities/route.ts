@@ -1,71 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import pool from '@/lib/db';
+import { getCommunitiesFromDB } from '@/lib/utils/communities.utils';
 import {
   Community,
   CreateCommunityPayload,
   CreateCommunityPayloadSchema,
-  DatabaseCommunity,
 } from '@/models/communities.model';
 
 // ..................................................
 // #region GET Communities
 
-const getCommunitiesFromDB = async (): Promise<Community[]> => {
-  const result = await pool.query<DatabaseCommunity>(`
-      SELECT 
-        c.id,
-        c.title,
-        c.description,
-        c.avatar_url,
-        c.created_at,
-        c.only_author_can_post,
-        u.id AS author_id,
-        u.name AS author_username,
-        u.avatar_url AS author_avatar_url,
-        COALESCE(
-          json_agg(
-            DISTINCT jsonb_build_object('id', cat.id, 'name', cat.name)
-          ) FILTER (WHERE cat.id IS NOT NULL),
-          '[]'
-        ) AS categories
-      FROM communities c
-      JOIN users u ON u.id = c.author_id
-      LEFT JOIN community_categories cc ON cc.community_id = c.id
-      LEFT JOIN categories cat ON cat.id = cc.category_id
-      WHERE c.deleted_at IS NULL
-      GROUP BY c.id, u.id
-      ORDER BY c.created_at DESC;
-    `);
+export const GET = async (req: NextRequest) => {
+  const userId = req.headers.get('x-user-id');
+  const { searchParams } = new URL(req.url);
 
-  return result.rows.map(
-    ({
-      avatar_url,
-      author_id,
-      author_username,
-      author_avatar_url,
-      only_author_can_post,
-      created_at,
-      updated_at,
-      ...dbCommunity
-    }) => ({
-      ...dbCommunity,
-      avatarUrl: avatar_url,
-      author: {
-        id: author_id,
-        username: author_username,
-        avatarUrl: author_avatar_url,
-      },
-      onlyAuthorCanPost: only_author_can_post,
-      createdAt: created_at,
-      updatedAt: updated_at,
-    }),
-  );
-};
+  const authorId = searchParams.get('authorId');
+  const followerId = searchParams.get('followerId');
 
-export const GET = async () => {
+  let onlyAuthorCanPost = null;
+  const onlyAuthorCanPostParam = searchParams.get('onlyAuthorCanPost');
+
+  if (onlyAuthorCanPostParam === 'true') {
+    onlyAuthorCanPost = true;
+  }
+
+  if (onlyAuthorCanPostParam === 'false') {
+    onlyAuthorCanPost = false;
+  }
+
+  const categoryIds = searchParams.getAll('categoryId');
+  const validCategoryIds = categoryIds.length > 0 ? categoryIds : null;
+
   try {
-    const communities = await getCommunitiesFromDB();
+    const communities = await getCommunitiesFromDB({
+      userId,
+      authorId,
+      categoryIds: validCategoryIds,
+      followerId,
+      onlyAuthorCanPost,
+    });
 
     return NextResponse.json<Community[]>(communities, { status: 200 });
   } catch (error) {
@@ -84,7 +58,6 @@ export const GET = async () => {
 
 export const POST = async (req: NextRequest) => {
   const userId = req.headers.get('x-user-id')!;
-
   const payload = (await req.json()) as CreateCommunityPayload;
 
   try {
@@ -98,10 +71,10 @@ export const POST = async (req: NextRequest) => {
 
     const result = await pool.query(
       `
-        INSERT INTO communities (title, description, avatar_url, author_id, only_author_can_post)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING id;
-        `,
+      INSERT INTO communities (title, description, avatar_url, author_id, only_author_can_post)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id;
+      `,
       [
         payload.title,
         payload.description,
@@ -132,6 +105,15 @@ export const POST = async (req: NextRequest) => {
 
       await pool.query(insertQuery, params);
     }
+
+    await pool.query(
+      `
+      INSERT INTO community_subscriptions (user_id, community_id)
+      VALUES ($1, $2)
+      ON CONFLICT DO NOTHING;
+      `,
+      [userId, communityId],
+    );
 
     await pool.query('COMMIT');
 

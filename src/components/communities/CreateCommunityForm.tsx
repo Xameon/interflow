@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Flex, Input, Textarea } from '@chakra-ui/react';
+import { Button, Flex, Heading, Input, Textarea } from '@chakra-ui/react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -9,6 +9,7 @@ import { useUploadFiles } from '@/hooks/firebase/useUploadFiles';
 import { CreateCommunityPayload } from '@/models/communities.model';
 
 import { ImagesUploader } from '../ImagesUploader';
+import { SelectCategories } from './SelectCategories';
 import { Checkbox } from '../ui/checkbox';
 import { Field } from '../ui/field';
 
@@ -70,6 +71,9 @@ export const CreateCommunityForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
+      <Heading color='colorPalette.900' my='4'>
+        New Community
+      </Heading>
       <Flex gap='1rem' direction='column'>
         <Field
           label='Title'
@@ -96,6 +100,27 @@ export const CreateCommunityForm = () => {
             {...register('description')}
           />
         </Field>
+
+        <Controller
+          control={control}
+          name='categoryIds'
+          render={({ field }) => (
+            <SelectCategories
+              value={field.value}
+              onChange={category => {
+                const updatedValue = field.value.filter(
+                  id => id !== category.id,
+                );
+
+                if (!category.included) {
+                  updatedValue.push(category.id);
+                }
+
+                field.onChange(updatedValue);
+              }}
+            />
+          )}
+        />
 
         <Controller
           control={control}

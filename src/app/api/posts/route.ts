@@ -11,24 +11,26 @@ import {
 // ..................................................
 // #region Get Posts
 
-const getPostsFromDB = async ({
-  headerUserId,
-  queryUserId,
-  communityId,
-  categoryIds,
-}: {
+type GetPostsFromDB = {
   headerUserId: string | null;
-  queryUserId: string | null;
+  authorId: string | null;
   communityId: string | null;
   categoryIds: string[] | null;
-}): Promise<Post[]> => {
+};
+
+const getPostsFromDB = async ({
+  headerUserId,
+  authorId,
+  communityId,
+  categoryIds,
+}: GetPostsFromDB): Promise<Post[]> => {
   const values: (string | null)[] = [headerUserId];
   let paramIndex = 2;
   const filters: string[] = [];
 
-  if (queryUserId) {
+  if (authorId) {
     filters.push(`p.user_id = $${paramIndex}`);
-    values.push(queryUserId);
+    values.push(authorId);
     paramIndex++;
   }
 
@@ -150,7 +152,7 @@ export const GET = async (request: NextRequest) => {
   const headerUserId = request.headers.get('x-user-id');
   const { searchParams } = new URL(request.url);
 
-  const queryUserId = searchParams.get('userId') || null;
+  const authorId = searchParams.get('authorId') || null;
   const communityId = searchParams.get('communityId') || null;
   const categoryIds = searchParams.getAll('categoryId');
   const validCategoryIds = categoryIds.length > 0 ? categoryIds : null;
@@ -158,7 +160,7 @@ export const GET = async (request: NextRequest) => {
   try {
     const posts = await getPostsFromDB({
       headerUserId,
-      queryUserId,
+      authorId,
       communityId,
       categoryIds: validCategoryIds,
     });
@@ -180,7 +182,6 @@ export const GET = async (request: NextRequest) => {
 
 export const POST = async (request: NextRequest) => {
   const userId = request.headers.get('x-user-id')!;
-
   const payload = (await request.json()) as PostPayload;
 
   try {
@@ -192,14 +193,51 @@ export const POST = async (request: NextRequest) => {
     );
   }
 
-  const { title, description, imageUrls } = payload;
+  const { title, description, imageUrls, communityId } = payload;
 
   try {
+    const permissionRes = await pool.query(
+      `
+      SELECT 
+        c.author_id,
+        c.only_author_can_post,
+        EXISTS (
+          SELECT 1 FROM community_subscriptions cs
+          WHERE cs.community_id = c.id AND cs.user_id = $1
+        ) AS is_subscribed
+      FROM communities c
+      WHERE c.id = $2 AND c.deleted_at IS NULL;
+      `,
+      [userId, communityId],
+    );
+
+    if (permissionRes.rowCount === 0) {
+      return NextResponse.json(
+        { message: 'Community not found' },
+        { status: 404 },
+      );
+    }
+
+    const { author_id, only_author_can_post, is_subscribed } =
+      permissionRes.rows[0];
+
+    const isAuthor = author_id === userId;
+    const canPost = !only_author_can_post && is_subscribed;
+
+    if (!isAuthor && !canPost) {
+      return NextResponse.json(
+        { message: 'You are not allowed to post in this community' },
+        { status: 403 },
+      );
+    }
+
     const res = await pool.query(
-      `INSERT INTO posts (user_id, title, description) 
-      VALUES ($1, $2, $3) 
-      RETURNING id`,
-      [userId, title, description],
+      `
+      INSERT INTO posts (user_id, title, description, community_id) 
+      VALUES ($1, $2, $3, $4) 
+      RETURNING id;
+      `,
+      [userId, title, description, communityId],
     );
 
     const postId = res.rows[0].id;
@@ -208,8 +246,10 @@ export const POST = async (request: NextRequest) => {
       const values = imageUrls.map((_, i) => `($1, $${i + 2})`).join(', ');
 
       await pool.query(
-        `INSERT INTO post_images (post_id, image_url) 
-        VALUES ${values}`,
+        `
+        INSERT INTO post_images (post_id, image_url) 
+        VALUES ${values};
+        `,
         [postId, ...imageUrls],
       );
     }

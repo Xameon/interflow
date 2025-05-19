@@ -32,6 +32,7 @@ export const DatabaseCommunitySchema = z.object({
   author_id: z.string().uuid(),
   author_username: z.string(),
   author_avatar_url: z.string().url().nullable(),
+  is_subscribed: z.boolean(),
   categories: z.array(
     z.object({
       id: z.string().uuid(),
@@ -41,6 +42,19 @@ export const DatabaseCommunitySchema = z.object({
 });
 
 export type DatabaseCommunity = z.infer<typeof DatabaseCommunitySchema>;
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Category
+
+export const CategorySchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+});
+
+export type Category = z.infer<typeof CategorySchema>;
 
 // #endregion
 // ..................................................
@@ -56,17 +70,13 @@ export const CommunitySchema = z.object({
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   onlyAuthorCanPost: z.boolean(),
+  isSubscribed: z.boolean(),
   author: z.object({
     id: z.string().uuid(),
     username: z.string(),
     avatarUrl: z.string().url().nullable(),
   }),
-  categories: z.array(
-    z.object({
-      id: z.string().uuid(),
-      name: z.string(),
-    }),
-  ),
+  categories: z.array(CategorySchema),
 });
 
 export type Community = z.infer<typeof CommunitySchema>;

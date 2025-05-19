@@ -28,6 +28,10 @@ const protectedRoutes = [
     methods: ['POST'],
   },
   {
+    pathname: '/api/communities/subscriptions',
+    methods: ['POST', 'DELETE'],
+  },
+  {
     pathname: '/api/users/:id/followers',
     methods: ['POST', 'DELETE'],
   },

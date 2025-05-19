@@ -1,12 +1,28 @@
-import { Community, CreateCommunityPayload } from '@/models/communities.model';
+import qs from 'qs';
+
+import {
+  Category,
+  Community,
+  CreateCommunityPayload,
+} from '@/models/communities.model';
 
 import { api } from './api';
 
 // ..................................................
 // #region Get Communities
 
-export const getCommunities = async () => {
-  const res = await api.get<Community[]>('communities');
+export type GetCommunitiesParams = {
+  followerId?: string;
+  categoryIds?: string[];
+  authorId?: string;
+  onlyAuthorCanPost?: boolean;
+};
+
+export const getCommunities = async (params: GetCommunitiesParams) => {
+  const res = await api.get<Community[]>('communities', {
+    params,
+    paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
+  });
 
   return res;
 };
@@ -21,6 +37,70 @@ export const createCommunity = async (payload: CreateCommunityPayload) => {
   const res = await api.post<{ id: string }>('communities', payload);
 
   return res;
+};
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Get Community
+
+export const getCommunity = async (id: string) => {
+  const res = await api.get<Community>(`communities/${id}`);
+
+  return res;
+};
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Get Categories
+
+export const getCategories = async () => {
+  const res = await api.get<Category[]>('communities/categories');
+
+  return res;
+};
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Update Community
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Delete Community
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Follow Community
+
+export type FollowCommunityResponse = {
+  message: string;
+};
+
+export const followCommunity = async (communityId: string) => {
+  const res = await api.post<FollowCommunityResponse>(
+    `communities/${communityId}/subscriptions`,
+  );
+
+  return res;
+};
+
+// #endregion
+// ..................................................
+
+// ..................................................
+// #region Unfollow Community
+
+export const unfollowCommunity = async (communityId: string) => {
+  await api.delete<void>(`communities/${communityId}/subscriptions`);
 };
 
 // #endregion

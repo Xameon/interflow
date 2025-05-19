@@ -1,12 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getCommunities } from '@/lib/api/communities.api';
+import {
+  getCommunities,
+  GetCommunitiesParams,
+} from '@/lib/api/communities.api';
 import { QueryParams } from '@/models';
 
-export const useCommunities = ({ options }: QueryParams) => {
+export const useCommunities = ({
+  params,
+  options,
+}: QueryParams<GetCommunitiesParams>) => {
   return useQuery({
     queryKey: ['communities'],
-    queryFn: () => getCommunities().then(res => res.data),
+    queryFn: () => getCommunities(params).then(res => res.data),
     ...options,
   });
 };

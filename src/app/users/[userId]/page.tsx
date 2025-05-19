@@ -9,7 +9,7 @@ const UserPage = async ({ params }: APIRequestContext<{ userId: string }>) => {
   return (
     <Box
       css={{
-        maxW: '6xl',
+        maxW: '4xl',
         mx: 'auto',
       }}
     >

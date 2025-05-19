@@ -82,7 +82,7 @@ export const CommentsChildren = ({
     }
 
     return (
-      <Flex direction='column' gap='4'>
+      <Flex direction='column' gap='4' w='full' p='1'>
         <For each={commentChildren}>
           {comment => <Comment key={comment.id} comment={comment} isChild />}
         </For>
@@ -98,7 +98,7 @@ export const CommentsChildren = ({
       collapsible
       variant='outline'
       onValueChange={handleToggleOpened}
-      pl='6'
+      pl='4'
     >
       <Accordion.Item value='replies'>
         <Accordion.ItemTrigger display='flex' justifyContent='start'>
