@@ -5,7 +5,11 @@ import { LuUpload } from 'react-icons/lu';
 
 export const ImagesUploader = ({ ...props }: FileUploadRootProps) => {
   return (
-    <FileUpload.Root {...props}>
+    <FileUpload.Root
+      {...props}
+      accept='image/png, image/jpeg, image/jpg'
+      maxFileSize={10 * 1024 * 1024}
+    >
       <FileUpload.HiddenInput />
       <FileUpload.Dropzone>
         <Icon size='md' color='fg.muted'>

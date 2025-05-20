@@ -110,7 +110,7 @@ export const CreatePostForm = () => {
         <ImagesUploader
           maxW='xl'
           alignItems='stretch'
-          maxFiles={10}
+          maxFiles={5}
           onFileChange={({ acceptedFiles }) => setFiles(acceptedFiles)}
         />
 

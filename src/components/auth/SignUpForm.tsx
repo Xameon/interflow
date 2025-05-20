@@ -51,9 +51,8 @@ export const SignUpForm = () => {
   // Functions
 
   const onSubmit = async (payload: SignUpCredentials) => {
-    const data = await signUpAsync(payload);
+    await signUpAsync(payload);
 
-    localStorage.setItem('token', data.token);
     window.location.replace('/');
   };
 
