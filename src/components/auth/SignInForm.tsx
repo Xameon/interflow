@@ -49,9 +49,8 @@ export const SignInForm = () => {
   // Functions
 
   const onSubmit = async (payload: SignInCredentials) => {
-    const data = await signInAsync(payload);
+    await signInAsync(payload);
 
-    localStorage.setItem('token', data.token);
     window.location.replace('/');
   };
 
