@@ -1,0 +1,18 @@
+{
+  "cSpell.words": [
+    "Andriy",
+    "Chakra",
+    "embla",
+    "ILIKE",
+    "Shmalenko",
+    "uidotdev",
+    "usehooks",
+    "uuidv"
+  ],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always",
+    "source.fixAll": "always"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
