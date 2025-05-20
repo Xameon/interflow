@@ -84,6 +84,13 @@ export const NavActions = () => {
           <Menu.Positioner>
             <Menu.Content>
               <Menu.Item
+                value='following'
+                onClick={() => router.push(`/following`)}
+              >
+                Following
+              </Menu.Item>
+              <Menu.Separator />
+              <Menu.Item
                 value='profile'
                 onClick={() => router.push(`/users/${user.id}`)}
               >

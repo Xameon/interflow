@@ -8,12 +8,12 @@ import {
   HStack,
   Icon,
   IconButton,
+  Stack,
   Text,
 } from '@chakra-ui/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { FaRegHeart, FaHeart, FaRegComment } from 'react-icons/fa6';
-import { MdDelete } from 'react-icons/md';
 
 import { useDeletePost } from '@/hooks/posts/useDeletePost';
 import { useDislikePost } from '@/hooks/posts/useDislikePost';
@@ -141,7 +141,11 @@ export const PostCard = ({ post }: PostCardProps) => {
               <Blockquote.Content>{post.description}</Blockquote.Content>
             </Blockquote.Root>
           )}
-          <HStack justify='space-between'>
+          <Stack
+            direction={{ base: 'row', mdDown: 'column' }}
+            justify='space-between'
+            gap='4'
+          >
             <HStack gap='4'>
               <UserLabel
                 userId={post.author.id}
@@ -178,13 +182,11 @@ export const PostCard = ({ post }: PostCardProps) => {
                     disabled={deletePostLoading}
                     loading={deletePostLoading}
                     onClick={handleDeletePost}
-                  >
-                    Delete <MdDelete />
-                  </DeleteButton>
+                  />
                 </>
               )}
             </HStack>
-          </HStack>
+          </Stack>
           <HStack>
             <HStack gap='1'>
               <IconButton

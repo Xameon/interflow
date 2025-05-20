@@ -1,20 +1,22 @@
 'use client';
 
-import { Flex, Button } from '@chakra-ui/react';
-import Link from 'next/link';
+import { Flex } from '@chakra-ui/react';
+import { useWindowSize } from '@uidotdev/usehooks';
 
-import { useAuthContext } from '@/hooks/useAuthContext';
-
+import { DesktopHeader } from './components/DesktopHeader';
+import { MobileHeader } from './components/MobileHeader';
 import { NavActions } from './components/NavActions';
 
 export const NavHeader = () => {
-  const { userId } = useAuthContext();
+  const windowSize = useWindowSize();
+
+  const mobile = (windowSize.width ?? 0) < 720;
 
   return (
     <Flex
       as='header'
       css={{
-        justifyContent: 'center',
+        justifyContent: mobile ? 'space-between' : 'center',
         w: 'full',
         p: '4',
         position: 'sticky',
@@ -22,25 +24,8 @@ export const NavHeader = () => {
         roundedBottom: 'md',
       }}
     >
-      <Flex w='full' maxW='1440px' justify='space-between' gap='4'>
-        <Flex gap='1rem'>
-          <Button asChild variant='plain' size='lg'>
-            <Link href='/posts'>Posts</Link>
-          </Button>
-          {userId && (
-            <Button asChild variant='plain' size='lg'>
-              <Link href='/following'>Following</Link>
-            </Button>
-          )}
-          <Button asChild variant='plain' size='lg'>
-            <Link href='/communities'>Communities</Link>
-          </Button>
-          <Button asChild variant='plain' size='lg'>
-            <Link href='/users'>Search Users</Link>
-          </Button>
-        </Flex>
-        <NavActions />
-      </Flex>
+      {!mobile ? <DesktopHeader /> : <MobileHeader />}
+      <NavActions />
     </Flex>
   );
 };

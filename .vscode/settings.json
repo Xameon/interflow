@@ -1,5 +1,14 @@
 {
-  "cSpell.words": ["Andriy", "Chakra", "embla", "ILIKE", "Shmalenko", "uuidv"],
+  "cSpell.words": [
+    "Andriy",
+    "Chakra",
+    "embla",
+    "ILIKE",
+    "Shmalenko",
+    "uidotdev",
+    "usehooks",
+    "uuidv"
+  ],
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always",
