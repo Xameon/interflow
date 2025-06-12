@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌐 Interflow - Social network for communities based on interests and hobbies
+A full-featured web platform where users can create communities based on interests or hobbies, publish posts, comment, subscribe to communities, and interact with others. The project is implemented as a fullstack web application using Next.js, PostgreSQL, Supabase, Firebase, and Chakra UI.
 
-## Getting Started
+## 🚀 Features
+- 👥 User authentication and profile management
+- 🧑‍🤝‍🧑 Create communities with category selection and publication permissions
+- 📝 Publish and browse posts within communities
+- 💬 Comment on posts (supports nested comments)
+- 🔍 Search for posts and communities
+- 📸 Image uploads for posts (via Firebase Storage)
+- 🧠 Data caching and invalidation with React Query
+- 📱 Responsive and accessible UI built with Chakra UI
 
-First, run the development server:
+## 🛠️ Technologies
+- Next.js 15 (App Router)
+- Chakra UI 3
+- Tanstack Query
+- PostgreSQL
+- TypeScript
+- ESLint & Prettier
+ 
+## 💻 Required Software
+| 🛠️ Tool     | 🔗 Download Links                                                                                                                                                             | 💬 Notes                              |
+| :---------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------ |
+| **Node.js** | [Windows / macOS / Linux](https://nodejs.org/)                                                                                                                                | Version `20` or higher is required.   |
+| **npm**     | [Included with Node.js](https://nodejs.org/)                                                                                                                                  | Installed automatically with Node.js. |
+| **VS Code** | [Windows](https://code.visualstudio.com/docs/setup/windows) / [macOS](https://code.visualstudio.com/docs/setup/mac) / [Linux](https://code.visualstudio.com/docs/setup/linux) | Recommended editor.                   |
+| **Git**     | [Windows](https://git-scm.com/download/win) / [macOS](https://git-scm.com/download/mac) / [Linux](https://git-scm.com/download/linux)                                         | Version control system.               |
+| **Browser** | [Google Chrome](https://www.google.com/chrome/) / [Firefox](https://www.mozilla.org/firefox/new/) / Any modern browser                                                        | Used for testing and running the app. |
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 👍 Recommended VS Code Extensions
+| 🧩 Extension                                                                                                        | 📝 Description                                                                                       |
+| :------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
+| [**Better Comments**](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments)               | Improve code readability by categorizing comments into alerts, queries, TODOs, highlights, and more. |
+| [**Code Spell Checker**](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker) | A basic spell checker to catch common spelling mistakes in code, comments, strings, and more.        |
+| [**ESLint**](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)                            | Integrates ESLint into VS Code to automatically find and fix problems in JavaScript/TypeScript code. |
+| [**Prettier - Code Formatter**](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)         | An opinionated code formatter that enforces a consistent style by parsing and reprinting your code.  |
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+_These extensions help maintain clean and high-quality code._
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ⚡ Getting Started
+1. Clone the repository.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the project:
+   ```bash
+   npm run dev
+   ```
+   
+## ❗ Before Pushing
+1. Format the code:
+   ```bash
+   npm run prettier
+   ```
+2. Lint the code:
+   ```bash
+   npm run lint
+   ```
+3. Check type errors:
+   ```
+   npm run tsc
+   ```
