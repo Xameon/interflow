@@ -35,3 +35,11 @@ actor "User (authorized)" as User
         - Control own content
         - Communities control
     end note
+
+stateDiagram-v2
+[*] --> Still
+Still --> [*]
+Still --> Moving
+Moving --> Still
+Moving --> Crash
+Crash --> [*]
